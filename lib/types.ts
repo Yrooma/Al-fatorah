@@ -10,7 +10,9 @@ export interface InvoiceData {
   invoiceNumber: string
   date: string
   dueDate: string
+  showDueDate: boolean
   freelanceDocNumber: string
+  senderLogo: string
   
   // Sender Info
   senderName: string
@@ -91,7 +93,9 @@ export function createEmptyInvoice(): InvoiceData {
     invoiceNumber: generateInvoiceNumber(),
     date: now.toISOString().split('T')[0],
     dueDate: dueDate.toISOString().split('T')[0],
+    showDueDate: false,
     freelanceDocNumber: '',
+    senderLogo: '',
     
     senderName: '',
     senderAddress: '',

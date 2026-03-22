@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { InvoiceData, calculateInvoiceTotals, currencies } from '@/lib/types'
+'use client'
+
+import { InvoiceData, calculateInvoiceTotals, currencies } from './types'
 
 function formatCurrency(amount: number, currencyCode: string): string {
   const currency = currencies.find(c => c.code === currencyCode) || currencies[0]
@@ -14,7 +15,7 @@ function formatDate(dateStr: string): string {
   })
 }
 
-function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean): string {
+export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean): string {
   const totals = calculateInvoiceTotals(invoice)
   
   const itemsHTML = invoice.items
@@ -51,6 +52,10 @@ function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean): string {
     ? '<div class="watermark">الفاتورة.io</div>'
     : ''
 
+  const logoHTML = invoice.senderLogo 
+    ? `<img src="${invoice.senderLogo}" alt="Logo" style="height: 60px; width: auto; max-width: 150px; object-fit: contain; margin-left: 16px;" crossorigin="anonymous" />`
+    : ''
+
   return `
     <!DOCTYPE html>
     <html lang="ar" dir="rtl">
@@ -58,8 +63,9 @@ function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean): string {
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>فاتورة ${invoice.invoiceNumber}</title>
-      <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
       <style>
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+        
         * {
           margin: 0;
           padding: 0;
@@ -67,16 +73,17 @@ function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean): string {
         }
         
         body {
-          font-family: 'IBM Plex Sans Arabic', sans-serif;
+          font-family: 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
           font-size: 14px;
           line-height: 1.6;
           color: #1f2937;
           background: white;
           padding: 40px;
+          direction: rtl;
         }
         
         .mono {
-          font-family: 'IBM Plex Mono', monospace;
+          font-family: 'IBM Plex Mono', 'Courier New', monospace;
         }
         
         ${watermarkCSS}
@@ -94,6 +101,11 @@ function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean): string {
           margin-bottom: 40px;
           padding-bottom: 20px;
           border-bottom: 2px solid #3b82f6;
+        }
+        
+        .header-right {
+          display: flex;
+          align-items: center;
         }
         
         .title {
@@ -258,7 +270,7 @@ function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean): string {
         }
         
         .iban {
-          font-family: 'IBM Plex Mono', monospace;
+          font-family: 'IBM Plex Mono', 'Courier New', monospace;
           letter-spacing: 2px;
         }
         
@@ -306,26 +318,18 @@ function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean): string {
           background: #fef3c7;
           color: #92400e;
         }
-        
-        @media print {
-          body {
-            padding: 20px;
-          }
-          
-          .watermark {
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-          }
-        }
       </style>
     </head>
     <body>
       ${watermarkHTML}
       <div class="container">
         <div class="header">
-          <div>
-            <h1 class="title">فاتورة</h1>
-            <p class="title-en">Invoice</p>
+          <div class="header-right">
+            ${logoHTML}
+            <div>
+              <h1 class="title">فاتورة</h1>
+              <p class="title-en">Invoice</p>
+            </div>
           </div>
           <div class="meta">
             <div class="meta-item">
@@ -336,10 +340,12 @@ function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean): string {
               <span class="meta-label">التاريخ:</span>
               <span class="meta-value">${formatDate(invoice.date)}</span>
             </div>
+            ${invoice.showDueDate ? `
             <div class="meta-item">
               <span class="meta-label">تاريخ الاستحقاق:</span>
               <span class="meta-value">${formatDate(invoice.dueDate)}</span>
             </div>
+            ` : ''}
             ${
               invoice.freelanceDocNumber
                 ? `
@@ -465,63 +471,94 @@ function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean): string {
   `
 }
 
-export async function POST(request: NextRequest) {
+export async function generatePDF(invoice: InvoiceData, hasPaid: boolean = false): Promise<void> {
+  const html = generateInvoiceHTML(invoice, hasPaid)
+  
+  // Create hidden iframe for rendering
+  const iframe = document.createElement('iframe')
+  iframe.style.position = 'fixed'
+  iframe.style.right = '-9999px'
+  iframe.style.width = '794px' // A4 width at 96dpi
+  iframe.style.height = '1123px' // A4 height at 96dpi
+  document.body.appendChild(iframe)
+  
+  const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document
+  if (!iframeDoc) {
+    document.body.removeChild(iframe)
+    throw new Error('Could not access iframe document')
+  }
+  
+  iframeDoc.open()
+  iframeDoc.write(html)
+  iframeDoc.close()
+  
+  // Wait for fonts and images to load
+  await new Promise<void>((resolve) => {
+    const checkReady = () => {
+      if (iframeDoc.readyState === 'complete') {
+        // Additional delay for fonts
+        setTimeout(resolve, 500)
+      } else {
+        setTimeout(checkReady, 100)
+      }
+    }
+    checkReady()
+  })
+  
   try {
-    const { invoice, hasPaid } = await request.json() as { invoice: InvoiceData; hasPaid: boolean }
+    const html2canvas = (await import('html2canvas')).default
+    const { jsPDF } = await import('jspdf')
     
-    if (!invoice) {
-      return NextResponse.json({ error: 'Invoice data is required' }, { status: 400 })
+    const container = iframeDoc.querySelector('.container') as HTMLElement
+    if (!container) {
+      throw new Error('Container not found')
     }
     
-    const html = generateInvoiceHTML(invoice, hasPaid)
+    const canvas = await html2canvas(iframeDoc.body, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#ffffff',
+      width: 794,
+      windowWidth: 794,
+    })
     
-    // For now, we'll return HTML that can be printed as PDF
-    // In production, this would use Puppeteer via a serverless function
-    // or a dedicated PDF service
+    const imgData = canvas.toDataURL('image/jpeg', 0.95)
     
-    // Check if we have Puppeteer available (server environment)
-    try {
-      const puppeteer = await import('puppeteer')
-      const browser = await puppeteer.default.launch({
-        headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
-      })
-      
-      const page = await browser.newPage()
-      await page.setContent(html, { waitUntil: 'networkidle0' })
-      
-      const pdfBuffer = await page.pdf({
-        format: 'A4',
-        printBackground: true,
-        margin: {
-          top: '20mm',
-          right: '20mm',
-          bottom: '20mm',
-          left: '20mm',
-        },
-      })
-      
-      await browser.close()
-      
-      return new NextResponse(pdfBuffer, {
-        headers: {
-          'Content-Type': 'application/pdf',
-          'Content-Disposition': `attachment; filename="${invoice.invoiceNumber}.pdf"`,
-        },
-      })
-    } catch {
-      // Fallback: Return HTML for client-side printing
-      return new NextResponse(html, {
-        headers: {
-          'Content-Type': 'text/html; charset=utf-8',
-        },
-      })
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4',
+    })
+    
+    const pdfWidth = pdf.internal.pageSize.getWidth()
+    const pdfHeight = pdf.internal.pageSize.getHeight()
+    
+    const imgWidth = canvas.width
+    const imgHeight = canvas.height
+    
+    // Calculate proper scaling to fit A4
+    const imgAspect = imgWidth / imgHeight
+    const pdfAspect = pdfWidth / pdfHeight
+    
+    let finalWidth: number
+    let finalHeight: number
+    
+    if (imgAspect > pdfAspect) {
+      finalWidth = pdfWidth
+      finalHeight = pdfWidth / imgAspect
+    } else {
+      finalHeight = pdfHeight
+      finalWidth = pdfHeight * imgAspect
     }
-  } catch (error) {
-    console.error('Error generating PDF:', error)
-    return NextResponse.json(
-      { error: 'Failed to generate PDF' },
-      { status: 500 }
-    )
+    
+    const imgX = (pdfWidth - finalWidth) / 2
+    const imgY = 0
+    
+    pdf.addImage(imgData, 'JPEG', imgX, imgY, finalWidth, finalHeight)
+    
+    pdf.save(`${invoice.invoiceNumber}.pdf`)
+  } finally {
+    document.body.removeChild(iframe)
   }
 }

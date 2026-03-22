@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { FileText, FolderOpen, Settings } from 'lucide-react'
+import { FileText, FolderOpen } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export function Header() {
@@ -11,7 +11,6 @@ export function Header() {
   const navItems = [
     { href: '/', label: 'فاتورة جديدة', icon: FileText },
     { href: '/invoices', label: 'فواتيري', icon: FolderOpen },
-    { href: '/settings', label: 'الإعدادات', icon: Settings },
   ]
   
   return (

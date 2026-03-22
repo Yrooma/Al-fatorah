@@ -10,6 +10,7 @@ export interface UserSettings {
   senderAddress: string
   senderPhone: string
   senderEmail: string
+  senderLogo: string
   iban: string
   bankName: string
   accountHolder: string
@@ -61,46 +62,29 @@ export function getInvoiceById(id: string): InvoiceData | null {
   return invoices.find(inv => inv.id === id) || null
 }
 
+const defaultSettings: UserSettings = {
+  senderName: '',
+  senderAddress: '',
+  senderPhone: '',
+  senderEmail: '',
+  senderLogo: '',
+  iban: '',
+  bankName: '',
+  accountHolder: '',
+  freelanceDocNumber: '',
+  defaultCurrency: 'SAR',
+}
+
 export function getSettings(): UserSettings {
   if (typeof window === 'undefined') {
-    return {
-      senderName: '',
-      senderAddress: '',
-      senderPhone: '',
-      senderEmail: '',
-      iban: '',
-      bankName: '',
-      accountHolder: '',
-      freelanceDocNumber: '',
-      defaultCurrency: 'SAR',
-    }
+    return defaultSettings
   }
   
   try {
     const data = localStorage.getItem(SETTINGS_KEY)
-    return data ? JSON.parse(data) : {
-      senderName: '',
-      senderAddress: '',
-      senderPhone: '',
-      senderEmail: '',
-      iban: '',
-      bankName: '',
-      accountHolder: '',
-      freelanceDocNumber: '',
-      defaultCurrency: 'SAR',
-    }
+    return data ? { ...defaultSettings, ...JSON.parse(data) } : defaultSettings
   } catch {
-    return {
-      senderName: '',
-      senderAddress: '',
-      senderPhone: '',
-      senderEmail: '',
-      iban: '',
-      bankName: '',
-      accountHolder: '',
-      freelanceDocNumber: '',
-      defaultCurrency: 'SAR',
-    }
+    return defaultSettings
   }
 }
 

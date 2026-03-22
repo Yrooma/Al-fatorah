@@ -28,7 +28,6 @@ import { Empty } from '@/components/ui/empty'
 import { FileText, Download, Trash2, Eye, Plus } from 'lucide-react'
 import { getInvoices, deleteInvoice } from '@/lib/storage'
 import { InvoiceData, calculateInvoiceTotals, formatCurrency } from '@/lib/types'
-import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 
 export default function InvoicesPage() {
@@ -40,35 +39,26 @@ export default function InvoicesPage() {
     setIsLoading(false)
   }, [])
   
+  const [message, setMessage] = React.useState<string | null>(null)
+  
+  const showMessage = (msg: string) => {
+    setMessage(msg)
+    setTimeout(() => setMessage(null), 3000)
+  }
+  
   const handleDelete = (id: string) => {
     deleteInvoice(id)
     setInvoices(getInvoices())
-    toast.success('تم حذف الفاتورة')
+    showMessage('تم حذف الفاتورة')
   }
   
   const handleDownload = async (invoice: InvoiceData) => {
     try {
-      const response = await fetch('/api/generate-pdf', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ invoice, hasPaid: false }),
-      })
-      
-      if (!response.ok) throw new Error('Failed to generate PDF')
-      
-      const blob = await response.blob()
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `${invoice.invoiceNumber}.pdf`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
-      
-      toast.success('تم تحميل الفاتورة')
+      const { generatePDF } = await import('@/lib/pdf-generator')
+      await generatePDF(invoice, false)
+      showMessage('تم تحميل الفاتورة')
     } catch {
-      toast.error('حدث خطأ أثناء تحميل الفاتورة')
+      showMessage('حدث خطأ أثناء تحميل الفاتورة')
     }
   }
   
@@ -106,6 +96,12 @@ export default function InvoicesPage() {
   
   return (
     <div className="min-h-screen bg-background">
+      {/* Toast Message */}
+      {message && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 rounded-lg bg-foreground text-background px-4 py-2 shadow-lg animate-in fade-in slide-in-from-top-2 duration-200">
+          {message}
+        </div>
+      )}
       <Header />
       <main className="container mx-auto px-4 py-8">
         <div className="mb-6 flex items-center justify-between">

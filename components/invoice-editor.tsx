@@ -39,7 +39,7 @@ interface InvoiceEditorProps {
 
 export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
   const router = useRouter()
-  const { t, locale } = useLanguage()
+  const { t, locale, isRTL } = useLanguage()
   
   const [invoice, setInvoice] = React.useState<InvoiceData | null>(null)
   const [settings, setSettings] = React.useState<UserSettings | null>(null)
@@ -260,7 +260,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
       const { generatePDF } = await import('@/lib/pdf-generator')
       
       // Generate and download PDF
-      const success = await generatePDF(invoice, false)
+      const success = await generatePDF(invoice, false, locale)
       
       if (success) {
         // Small delay to ensure download started
@@ -303,7 +303,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
       <Collapsible open={settingsOpen} onOpenChange={setSettingsOpen}>
         <div className="rounded-xl border bg-card shadow-sm">
           <CollapsibleTrigger asChild>
-            <button className="flex w-full items-center justify-between p-4 text-right hover:bg-muted/50 transition-colors rounded-xl">
+            <button className="flex w-full items-center justify-between p-4 hover:bg-muted/50 transition-colors rounded-xl">
               <div className="flex items-center gap-2">
                 {settingsOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
               </div>
@@ -378,7 +378,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                     onChange={(e) => updateSettings('senderPhone', e.target.value)}
                     type="tel"
                     dir="ltr"
-                    className={cn("border border-input text-right", editableFieldClass)}
+                    className={cn("border border-input text-end", editableFieldClass)}
                   />
                   <GhostInput
                     placeholder={t.email}
@@ -386,7 +386,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                     onChange={(e) => updateSettings('senderEmail', e.target.value)}
                     type="email"
                     dir="ltr"
-                    className={cn("border border-input text-right", editableFieldClass)}
+                    className={cn("border border-input text-end", editableFieldClass)}
                   />
                 </div>
                 
@@ -410,7 +410,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                     value={settings.iban}
                     onChange={(e) => updateSettings('iban', e.target.value)}
                     dir="ltr"
-                    className={cn("border border-input bg-sky-50 dark:bg-sky-950/30 font-mono text-right tracking-wider", editableFieldClass)}
+                    className={cn("border border-input bg-sky-50 dark:bg-sky-950/30 font-mono text-end tracking-wider", editableFieldClass)}
                   />
                   <div className="pt-2">
                     <Label className="text-sm font-medium">{t.defaultCurrency}</Label>
@@ -469,13 +469,13 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                   onClick={addSettingsRegulatoryNumber}
                   className="text-primary"
                 >
-                  <Plus className="ml-1 h-4 w-4" />
+                  <Plus className="me-1 h-4 w-4" />
                   {t.addRegulatoryNumber}
                 </Button>
               </div>
               
               <Button onClick={handleSaveSettings} className="w-full sm:w-auto">
-                <Save className="ml-2 h-4 w-4" />
+                <Save className="me-2 h-4 w-4" />
                 {t.saveSettings}
               </Button>
             </div>
@@ -505,11 +505,11 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
         
         <div className="flex items-center gap-2">
           <Button variant="outline" onClick={handleSave}>
-            <Save className="ml-2 h-4 w-4" />
+            <Save className="me-2 h-4 w-4" />
             {t.save}
           </Button>
           <Button onClick={handleDownloadPdf} disabled={isGeneratingPdf}>
-            <Download className="ml-2 h-4 w-4" />
+            <Download className="me-2 h-4 w-4" />
             {isGeneratingPdf ? t.downloading : t.downloadPdf}
           </Button>
         </div>
@@ -558,7 +558,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
               <GhostInput
                 value={invoice.invoiceNumber}
                 onChange={(e) => updateInvoice('invoiceNumber', e.target.value)}
-                className={cn("w-28 sm:w-36 text-left font-mono text-sm", editableFieldClass)}
+                className={cn("w-28 sm:w-36 text-start font-mono text-sm", editableFieldClass)}
                 dir="ltr"
               />
             </div>
@@ -628,7 +628,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                 onChange={(e) => updateInvoice('senderPhone', e.target.value)}
                 type="tel"
                 dir="ltr"
-                className={cn("text-right text-sm", editableFieldClass)}
+                className={cn("text-end text-sm", editableFieldClass)}
               />
               <GhostInput
                 placeholder={t.email}
@@ -636,7 +636,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                 onChange={(e) => updateInvoice('senderEmail', e.target.value)}
                 type="email"
                 dir="ltr"
-                className={cn("text-right text-sm", editableFieldClass)}
+                className={cn("text-end text-sm", editableFieldClass)}
               />
             </div>
           </div>
@@ -659,7 +659,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                   {recentClients.map((client, index) => (
                     <button
                       key={index}
-                      className="w-full rounded-md px-2 py-1.5 text-right text-sm hover:bg-muted"
+                      className="w-full rounded-md px-2 py-1.5 text-start text-sm hover:bg-muted"
                       onClick={() => selectClient(client)}
                     >
                       {client.name}
@@ -679,7 +679,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                 onChange={(e) => updateInvoice('clientPhone', e.target.value)}
                 type="tel"
                 dir="ltr"
-                className={cn("text-right text-sm", editableFieldClass)}
+                className={cn("text-end text-sm", editableFieldClass)}
               />
               <GhostInput
                 placeholder={t.email}
@@ -687,7 +687,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                 onChange={(e) => updateInvoice('clientEmail', e.target.value)}
                 type="email"
                 dir="ltr"
-                className={cn("text-right text-sm", editableFieldClass)}
+                className={cn("text-end text-sm", editableFieldClass)}
               />
             </div>
           </div>
@@ -698,10 +698,10 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
           <table className="w-full min-w-[500px]">
             <thead>
               <tr className="border-b text-sm text-muted-foreground">
-                <th className="pb-3 text-right font-medium">{t.description}</th>
+                <th className="pb-3 text-start font-medium">{t.description}</th>
                 <th className="w-24 pb-3 text-center font-medium">{t.quantity}</th>
                 <th className="w-32 pb-3 text-center font-medium">{t.price}</th>
-                <th className="w-32 pb-3 text-left font-medium">{t.total}</th>
+                <th className="w-32 pb-3 text-end font-medium">{t.total}</th>
                 <th className="w-10 pb-3"></th>
               </tr>
             </thead>
@@ -736,7 +736,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                       placeholder="0.00"
                     />
                   </td>
-                  <td className="py-2 text-left font-medium">
+                  <td className="py-2 text-end font-medium">
                     {formatCurrency(item.quantity * item.price, invoice.currency)}
                   </td>
                   <td className="py-2">
@@ -823,7 +823,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
           onClick={addItem}
           className="mb-6 text-primary"
         >
-          <Plus className="ml-1 h-4 w-4" />
+          <Plus className="me-1 h-4 w-4" />
           {t.addItem}
         </Button>
         
@@ -1031,7 +1031,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
               onClick={handleSave}
               className="flex-1"
             >
-              <Save className="ml-2 h-4 w-4" />
+              <Save className="me-2 h-4 w-4" />
               {t.save}
             </Button>
             <Button 
@@ -1039,7 +1039,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
               disabled={isGeneratingPdf}
               className="flex-[2]"
             >
-              <Download className="ml-2 h-4 w-4" />
+              <Download className="me-2 h-4 w-4" />
               {isGeneratingPdf ? t.downloading : t.downloadPdf}
             </Button>
           </div>

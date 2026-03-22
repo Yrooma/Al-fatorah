@@ -101,8 +101,9 @@
 }
 
 @theme inline {
-  --font-sans: 'IBM Plex Sans Arabic', 'Geist', 'Geist Fallback', system-ui, sans-serif;
-  --font-mono: 'IBM Plex Mono', 'Geist Mono', 'Geist Mono Fallback', monospace;
+  --font-sans: 'Inter', 'IBM Plex Sans Arabic', 'Geist', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Geist Mono', monospace;
+  --font-arabic: 'IBM Plex Sans Arabic', 'Geist', system-ui, sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -151,6 +152,21 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  
+  /* RTL language support */
+  [dir="rtl"] body {
+    font-family: 'IBM Plex Sans Arabic', 'Geist', system-ui, sans-serif;
+  }
+  
+  /* LTR language support */
+  [dir="ltr"] body {
+    font-family: 'Inter', 'Geist', system-ui, sans-serif;
+  }
+  
+  /* Arabic font utility class */
+  .font-arabic {
+    font-family: 'IBM Plex Sans Arabic', 'Geist', system-ui, sans-serif;
   }
 }
 

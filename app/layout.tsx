@@ -1,13 +1,19 @@
 import type { Metadata, Viewport } from 'next'
-import { IBM_Plex_Sans_Arabic, IBM_Plex_Mono } from 'next/font/google'
+import { IBM_Plex_Sans_Arabic, IBM_Plex_Mono, Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { LanguageProvider } from '@/lib/language-context'
 import './globals.css'
 
+const inter = Inter({
+  subsets: ['latin', 'cyrillic', 'greek', 'vietnamese'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-inter',
+})
+
 const ibmPlexArabic = IBM_Plex_Sans_Arabic({
   subsets: ['arabic', 'latin'],
   weight: ['300', '400', '500', '600', '700'],
-  variable: '--font-sans',
+  variable: '--font-arabic',
 })
 
 const ibmPlexMono = IBM_Plex_Mono({
@@ -60,7 +66,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
-      <body className={`${ibmPlexArabic.variable} ${ibmPlexMono.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} ${ibmPlexArabic.variable} ${ibmPlexMono.variable} antialiased`}>
         <LanguageProvider>
           {children}
         </LanguageProvider>

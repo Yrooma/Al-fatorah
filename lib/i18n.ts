@@ -266,7 +266,7 @@ const ar: Translations = {
   
   // Misc
   optional: 'اختياري',
-  imageTooLarge: 'حجم الصورة كبير جداً. الحد الأقصى 500KB',
+  imageTooLarge: 'حجم ا��صورة كبير جداً. الحد الأقصى 500KB',
   currency: 'العملة',
 }
 
@@ -411,7 +411,17 @@ export function getTranslations(locale: Locale = 'ar'): Translations {
   return translations[locale]
 }
 
-// Hook for future React Context implementation
-export function useTranslations(locale: Locale = 'ar'): Translations {
-  return translations[locale]
+// Simple hook - returns translations and locale
+// In the future, this can be enhanced with React Context for dynamic locale switching
+export function useTranslation(defaultLocale: Locale = 'ar') {
+  const locale = defaultLocale
+  const t = (key: keyof Translations): string => {
+    return translations[locale][key]
+  }
+  
+  return {
+    t,
+    locale,
+    translations: translations[locale],
+  }
 }

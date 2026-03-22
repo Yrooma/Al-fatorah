@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { FileText, FolderOpen } from 'lucide-react'
+import { FileText, FolderOpen, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useLanguage } from '@/lib/language-context'
 import { LanguageSwitcher } from './language-switcher'
@@ -14,6 +14,7 @@ export function Header() {
   const navItems = [
     { href: '/', label: t.newInvoice, icon: FileText },
     { href: '/invoices', label: t.myInvoices, icon: FolderOpen },
+    { href: '/pricing', label: isRTL ? 'الأسعار' : 'Pricing', icon: Sparkles, highlight: true },
   ]
   
   return (
@@ -36,6 +37,7 @@ export function Header() {
             {navItems.map((item) => {
               const Icon = item.icon
               const isActive = pathname === item.href
+              const highlight = 'highlight' in item && item.highlight
               
               return (
                 <Link
@@ -45,10 +47,12 @@ export function Header() {
                     'flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                     isActive
                       ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                      : highlight
+                        ? 'text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30'
+                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   )}
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className={cn("h-4 w-4", highlight && !isActive && "text-amber-500")} />
                   <span className="hidden sm:inline">{item.label}</span>
                 </Link>
               )

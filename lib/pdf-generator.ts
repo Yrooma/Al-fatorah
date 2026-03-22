@@ -2,6 +2,7 @@
 
 import { InvoiceData, calculateInvoiceTotals, currencies } from './types'
 import { Locale } from './i18n'
+import { shouldShowWatermark } from './subscription'
 
 // RTL languages
 const RTL_LANGUAGES: Locale[] = ['ar', 'ur']
@@ -21,7 +22,9 @@ function formatDate(dateStr: string, locale: Locale = 'ar'): string {
   })
 }
 
-export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean, locale: Locale = 'ar'): string {
+export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean = false, locale: Locale = 'ar'): string {
+  // Check subscription status for watermark (hasPaid overrides if explicitly true)
+  const showWatermark = hasPaid ? false : shouldShowWatermark()
   const isRTL = RTL_LANGUAGES.includes(locale)
   const dir = isRTL ? 'rtl' : 'ltr'
   const textAlign = isRTL ? 'right' : 'left'
@@ -43,7 +46,7 @@ export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean, loca
     )
     .join('')
 
-  const watermarkCSS = !hasPaid
+  const watermarkCSS = showWatermark
     ? `
       .watermark {
         position: fixed;
@@ -60,8 +63,8 @@ export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean, loca
     `
     : ''
 
-  const watermarkHTML = !hasPaid
-    ? '<div class="watermark">الفاتورة.io</div>'
+  const watermarkHTML = showWatermark
+    ? '<div class="watermark">Alfatoora.io</div>'
     : ''
 
   const logoHTML = invoice.senderLogo 
@@ -125,7 +128,7 @@ export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean, loca
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>${labels.invoice} ${invoice.invoiceNumber}</title>
       <style>
-        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap');
         
         * {
           margin: 0;
@@ -134,13 +137,13 @@ export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean, loca
         }
         
         body {
-          font-family: 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
+          font-family: ${isRTL ? "'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif" : "'Inter', 'Segoe UI', Tahoma, sans-serif"};
           font-size: 14px;
           line-height: 1.6;
           color: #1f2937;
           background: white;
           padding: 40px;
-          direction: rtl;
+          direction: ${dir};
         }
         
         .mono {
@@ -182,7 +185,7 @@ export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean, loca
         }
         
         .meta {
-          text-align: left;
+          text-align: ${textAlignOpposite};
         }
         
         .meta-item {
@@ -242,7 +245,7 @@ export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean, loca
         th {
           background: #f3f4f6;
           padding: 12px 16px;
-          text-align: right;
+          text-align: ${textAlign};
           font-weight: 600;
           font-size: 12px;
           color: #6b7280;
@@ -255,12 +258,12 @@ export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean, loca
         }
         
         th:nth-child(4) {
-          text-align: left;
+          text-align: ${textAlignOpposite};
         }
         
         .totals {
           display: flex;
-          justify-content: flex-start;
+          justify-content: ${isRTL ? 'flex-start' : 'flex-end'};
           margin-bottom: 32px;
         }
         

@@ -18,12 +18,12 @@ import {
 } from 'lucide-react'
 import { getInvoiceById } from '@/lib/storage'
 import { InvoiceData } from '@/lib/types'
-import { getTranslations } from '@/lib/i18n'
+import { useLanguage } from '@/lib/language-context'
 
 export default function SuccessPage() {
   const params = useParams()
   const id = params.id as string
-  const t = getTranslations('ar')
+  const { t } = useLanguage()
   
   const [invoice, setInvoice] = React.useState<InvoiceData | null>(null)
   const [linkCopied, setLinkCopied] = React.useState(false)

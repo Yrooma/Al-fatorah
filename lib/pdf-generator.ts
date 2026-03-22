@@ -56,6 +56,27 @@ export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean): str
     ? `<img src="${invoice.senderLogo}" alt="Logo" style="height: 60px; width: auto; max-width: 150px; object-fit: contain; margin-left: 16px;" crossorigin="anonymous" />`
     : ''
 
+  // Generate regulatory numbers HTML
+  const regulatoryNumbersHTML = (invoice.regulatoryNumbers || [])
+    .filter(rn => rn.label && rn.value)
+    .map(rn => `
+      <div class="meta-item">
+        <span class="meta-label">${rn.label}:</span>
+        <span class="meta-value mono">${rn.value}</span>
+      </div>
+    `)
+    .join('')
+
+  // Tax number HTML
+  const taxNumberHTML = invoice.taxEnabled && invoice.taxNumber
+    ? `
+      <div class="meta-item">
+        <span class="meta-label">الرقم الضريبي:</span>
+        <span class="meta-value mono">${invoice.taxNumber}</span>
+      </div>
+    `
+    : ''
+
   return `
     <!DOCTYPE html>
     <html lang="ar" dir="rtl">
@@ -346,16 +367,8 @@ export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean): str
               <span class="meta-value">${formatDate(invoice.dueDate)}</span>
             </div>
             ` : ''}
-            ${
-              invoice.freelanceDocNumber
-                ? `
-            <div class="meta-item">
-              <span class="meta-label">وثيقة العمل الحر:</span>
-              <span class="meta-value mono">${invoice.freelanceDocNumber}</span>
-            </div>
-            `
-                : ''
-            }
+            ${regulatoryNumbersHTML}
+            ${taxNumberHTML}
             <div class="meta-item" style="margin-top: 8px;">
               <span class="status-badge status-${invoice.paymentStatus}">
                 ${invoice.paymentStatus === 'paid' ? 'مدفوعة' : invoice.paymentStatus === 'partial' ? 'مدفوعة جزئياً' : 'غير مدفوعة'}
@@ -412,10 +425,10 @@ export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean): str
                 : ''
             }
             ${
-              invoice.taxEnabled
+              invoice.taxEnabled && totals.taxAmount > 0
                 ? `
             <div class="total-row">
-              <span>ضريبة القيمة المضافة (${invoice.taxRate}%)</span>
+              <span>الضريبة (${invoice.taxRate}%)</span>
               <span>${formatCurrency(totals.taxAmount, invoice.currency)}</span>
             </div>
             `
@@ -471,7 +484,7 @@ export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean): str
   `
 }
 
-export async function generatePDF(invoice: InvoiceData, hasPaid: boolean = false): Promise<void> {
+export async function generatePDF(invoice: InvoiceData, hasPaid: boolean = false): Promise<boolean> {
   const html = generateInvoiceHTML(invoice, hasPaid)
   
   // Create hidden iframe for rendering
@@ -485,7 +498,7 @@ export async function generatePDF(invoice: InvoiceData, hasPaid: boolean = false
   const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document
   if (!iframeDoc) {
     document.body.removeChild(iframe)
-    throw new Error('Could not access iframe document')
+    return false
   }
   
   iframeDoc.open()
@@ -508,11 +521,6 @@ export async function generatePDF(invoice: InvoiceData, hasPaid: boolean = false
   try {
     const html2canvas = (await import('html2canvas')).default
     const { jsPDF } = await import('jspdf')
-    
-    const container = iframeDoc.querySelector('.container') as HTMLElement
-    if (!container) {
-      throw new Error('Container not found')
-    }
     
     const canvas = await html2canvas(iframeDoc.body, {
       scale: 2,
@@ -558,7 +566,12 @@ export async function generatePDF(invoice: InvoiceData, hasPaid: boolean = false
     pdf.addImage(imgData, 'JPEG', imgX, imgY, finalWidth, finalHeight)
     
     pdf.save(`${invoice.invoiceNumber}.pdf`)
-  } finally {
+    
     document.body.removeChild(iframe)
+    return true
+  } catch (error) {
+    console.error('PDF generation error:', error)
+    document.body.removeChild(iframe)
+    return false
   }
 }

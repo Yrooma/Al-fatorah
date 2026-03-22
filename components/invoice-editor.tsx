@@ -29,7 +29,7 @@ import {
   createEmptyInvoice,
 } from '@/lib/types'
 import { saveInvoice, getSettings, getRecentClients, saveSettings, UserSettings } from '@/lib/storage'
-import { getTranslations } from '@/lib/i18n'
+import { useLanguage } from '@/lib/language-context'
 import { cn } from '@/lib/utils'
 
 interface InvoiceEditorProps {
@@ -39,7 +39,7 @@ interface InvoiceEditorProps {
 
 export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
   const router = useRouter()
-  const t = getTranslations('ar')
+  const { t, locale } = useLanguage()
   
   const [invoice, setInvoice] = React.useState<InvoiceData | null>(null)
   const [settings, setSettings] = React.useState<UserSettings | null>(null)
@@ -60,7 +60,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
       setInvoice({
         ...initialData,
         regulatoryNumbers: initialData.regulatoryNumbers || [],
-        taxAmount: initialData.taxAmount || 0,
+        taxRate: initialData.taxRate || 15,
         taxNumber: initialData.taxNumber || '',
       })
     } else {
@@ -214,6 +214,8 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
       currency: settings.defaultCurrency,
     } : prev)
     showMessage(t.settingsSaved)
+    // Auto-collapse settings after save
+    setSettingsOpen(false)
   }
   
   const handleSave = () => {
@@ -256,10 +258,20 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
       saveInvoice(invoice)
       
       const { generatePDF } = await import('@/lib/pdf-generator')
-      await generatePDF(invoice, false)
       
-      // Navigate to success page
-      router.push(`/success/${invoice.id}`)
+      // Generate and download PDF
+      const success = await generatePDF(invoice, false)
+      
+      if (success) {
+        // Small delay to ensure download started
+        await new Promise(resolve => setTimeout(resolve, 500))
+        
+        // Navigate to success page
+        router.push(`/success/${invoice.id}`)
+      } else {
+        showMessage(t.downloadError)
+        setIsGeneratingPdf(false)
+      }
     } catch (error) {
       console.error('PDF generation error:', error)
       showMessage(t.downloadError)
@@ -275,8 +287,11 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
     setShowClientSuggestions(false)
   }
   
+  // Editable field styles - subtle visual depth
+  const editableFieldClass = "shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)] hover:shadow-[inset_0_1px_3px_rgba(0,0,0,0.06)] focus:shadow-none transition-shadow"
+  
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className="mx-auto max-w-4xl space-y-6 pb-32 lg:pb-6">
       {/* Toast Message */}
       {saveMessage && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 rounded-lg bg-foreground text-background px-4 py-2 shadow-lg animate-in fade-in slide-in-from-top-2 duration-200">
@@ -349,13 +364,13 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                     placeholder={t.nameOrCompany}
                     value={settings.senderName}
                     onChange={(e) => updateSettings('senderName', e.target.value)}
-                    className="border border-input"
+                    className={cn("border border-input", editableFieldClass)}
                   />
                   <GhostInput
                     placeholder={t.address}
                     value={settings.senderAddress}
                     onChange={(e) => updateSettings('senderAddress', e.target.value)}
-                    className="border border-input"
+                    className={cn("border border-input", editableFieldClass)}
                   />
                   <GhostInput
                     placeholder={t.phone}
@@ -363,7 +378,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                     onChange={(e) => updateSettings('senderPhone', e.target.value)}
                     type="tel"
                     dir="ltr"
-                    className="border border-input text-right"
+                    className={cn("border border-input text-right", editableFieldClass)}
                   />
                   <GhostInput
                     placeholder={t.email}
@@ -371,7 +386,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                     onChange={(e) => updateSettings('senderEmail', e.target.value)}
                     type="email"
                     dir="ltr"
-                    className="border border-input text-right"
+                    className={cn("border border-input text-right", editableFieldClass)}
                   />
                 </div>
                 
@@ -382,20 +397,20 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                     placeholder={t.bankName}
                     value={settings.bankName}
                     onChange={(e) => updateSettings('bankName', e.target.value)}
-                    className="border border-input"
+                    className={cn("border border-input", editableFieldClass)}
                   />
                   <GhostInput
                     placeholder={t.accountHolderName}
                     value={settings.accountHolder}
                     onChange={(e) => updateSettings('accountHolder', e.target.value)}
-                    className="border border-input"
+                    className={cn("border border-input", editableFieldClass)}
                   />
                   <GhostInput
                     placeholder={t.ibanNumber}
                     value={settings.iban}
                     onChange={(e) => updateSettings('iban', e.target.value)}
                     dir="ltr"
-                    className="border border-input bg-sky-50 dark:bg-sky-950/30 font-mono text-right tracking-wider"
+                    className={cn("border border-input bg-sky-50 dark:bg-sky-950/30 font-mono text-right tracking-wider", editableFieldClass)}
                   />
                   <div className="pt-2">
                     <Label className="text-sm font-medium">{t.defaultCurrency}</Label>
@@ -409,7 +424,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                       <SelectContent>
                         {currencies.map((currency) => (
                           <SelectItem key={currency.code} value={currency.code}>
-                            {currency.symbol} - {currency.nameAr}
+                            {currency.symbol} - {locale === 'ar' ? currency.nameAr : currency.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -422,7 +437,9 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
               <div className="space-y-3">
                 <Label className="text-sm font-medium">{t.regulatoryNumber}</Label>
                 <p className="text-xs text-muted-foreground">
-                  مثال: السجل التجاري، وثيقة العمل الحر، الرقم الضريبي...
+                  {locale === 'ar' 
+                    ? 'مثال: السجل التجاري، وثيقة العمل الحر، الرقم الضريبي...'
+                    : 'e.g., Business License, Freelance Document, Tax ID...'}
                 </p>
                 {(settings.regulatoryNumbers || []).map((regNum) => (
                   <div key={regNum.id} className="flex items-center gap-2">
@@ -430,13 +447,13 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                       placeholder={t.regulatoryPlaceholderLabel}
                       value={regNum.label}
                       onChange={(e) => updateSettingsRegulatoryNumber(regNum.id, { label: e.target.value })}
-                      className="border border-input flex-1"
+                      className={cn("border border-input flex-1", editableFieldClass)}
                     />
                     <GhostInput
                       placeholder={t.regulatoryPlaceholderValue}
                       value={regNum.value}
                       onChange={(e) => updateSettingsRegulatoryNumber(regNum.id, { value: e.target.value })}
-                      className="border border-input flex-1 font-mono"
+                      className={cn("border border-input flex-1 font-mono", editableFieldClass)}
                     />
                     <button
                       onClick={() => removeSettingsRegulatoryNumber(regNum.id)}
@@ -466,8 +483,8 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
         </div>
       </Collapsible>
       
-      {/* Action Bar */}
-      <div className="no-print flex flex-wrap items-center justify-between gap-4">
+      {/* Action Bar - Desktop Only */}
+      <div className="no-print hidden lg:flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <Select
             value={invoice.currency}
@@ -479,7 +496,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
             <SelectContent>
               {currencies.map((currency) => (
                 <SelectItem key={currency.code} value={currency.code}>
-                  {currency.symbol} - {currency.nameAr}
+                  {currency.symbol} - {locale === 'ar' ? currency.nameAr : currency.name}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -496,6 +513,25 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
             {isGeneratingPdf ? t.downloading : t.downloadPdf}
           </Button>
         </div>
+      </div>
+      
+      {/* Mobile Currency Selector */}
+      <div className="lg:hidden">
+        <Select
+          value={invoice.currency}
+          onValueChange={(value) => updateInvoice('currency', value)}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {currencies.map((currency) => (
+              <SelectItem key={currency.code} value={currency.code}>
+                {currency.symbol} - {locale === 'ar' ? currency.nameAr : currency.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
       
       {/* Invoice Document */}
@@ -522,7 +558,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
               <GhostInput
                 value={invoice.invoiceNumber}
                 onChange={(e) => updateInvoice('invoiceNumber', e.target.value)}
-                className="w-28 sm:w-36 text-left font-mono text-sm"
+                className={cn("w-28 sm:w-36 text-left font-mono text-sm", editableFieldClass)}
                 dir="ltr"
               />
             </div>
@@ -532,7 +568,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                 type="date"
                 value={invoice.date}
                 onChange={(e) => updateInvoice('date', e.target.value)}
-                className="w-28 sm:w-36 text-sm"
+                className={cn("w-28 sm:w-36 text-sm", editableFieldClass)}
               />
             </div>
             
@@ -553,7 +589,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                   type="date"
                   value={invoice.dueDate}
                   onChange={(e) => updateInvoice('dueDate', e.target.value)}
-                  className="w-28 sm:w-36 text-sm"
+                  className={cn("w-28 sm:w-36 text-sm", editableFieldClass)}
                 />
               )}
             </div>
@@ -578,13 +614,13 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                 placeholder={t.senderName}
                 value={invoice.senderName}
                 onChange={(e) => updateInvoice('senderName', e.target.value)}
-                className="font-semibold text-sm sm:text-base"
+                className={cn("font-semibold text-sm sm:text-base", editableFieldClass)}
               />
               <GhostInput
                 placeholder={t.address}
                 value={invoice.senderAddress}
                 onChange={(e) => updateInvoice('senderAddress', e.target.value)}
-                className="text-sm"
+                className={cn("text-sm", editableFieldClass)}
               />
               <GhostInput
                 placeholder={t.phone}
@@ -592,7 +628,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                 onChange={(e) => updateInvoice('senderPhone', e.target.value)}
                 type="tel"
                 dir="ltr"
-                className="text-right text-sm"
+                className={cn("text-right text-sm", editableFieldClass)}
               />
               <GhostInput
                 placeholder={t.email}
@@ -600,7 +636,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                 onChange={(e) => updateInvoice('senderEmail', e.target.value)}
                 type="email"
                 dir="ltr"
-                className="text-right text-sm"
+                className={cn("text-right text-sm", editableFieldClass)}
               />
             </div>
           </div>
@@ -615,7 +651,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                 onChange={(e) => updateInvoice('clientName', e.target.value)}
                 onFocus={() => recentClients.length > 0 && setShowClientSuggestions(true)}
                 onBlur={() => setTimeout(() => setShowClientSuggestions(false), 200)}
-                className="font-semibold text-sm sm:text-base"
+                className={cn("font-semibold text-sm sm:text-base", editableFieldClass)}
               />
               {showClientSuggestions && recentClients.length > 0 && (
                 <div className="absolute left-0 right-0 top-full z-10 mt-1 rounded-lg border bg-card p-2 shadow-lg">
@@ -635,7 +671,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                 placeholder={t.address}
                 value={invoice.clientAddress}
                 onChange={(e) => updateInvoice('clientAddress', e.target.value)}
-                className="text-sm"
+                className={cn("text-sm", editableFieldClass)}
               />
               <GhostInput
                 placeholder={t.phone}
@@ -643,7 +679,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                 onChange={(e) => updateInvoice('clientPhone', e.target.value)}
                 type="tel"
                 dir="ltr"
-                className="text-right text-sm"
+                className={cn("text-right text-sm", editableFieldClass)}
               />
               <GhostInput
                 placeholder={t.email}
@@ -651,7 +687,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                 onChange={(e) => updateInvoice('clientEmail', e.target.value)}
                 type="email"
                 dir="ltr"
-                className="text-right text-sm"
+                className={cn("text-right text-sm", editableFieldClass)}
               />
             </div>
           </div>
@@ -677,6 +713,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                       placeholder={t.serviceOrProductDesc}
                       value={item.description}
                       onChange={(e) => updateItem(item.id, { description: e.target.value })}
+                      className={editableFieldClass}
                     />
                   </td>
                   <td className="py-2">
@@ -685,7 +722,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                       min="1"
                       value={item.quantity}
                       onChange={(e) => updateItem(item.id, { quantity: Number(e.target.value) || 1 })}
-                      className="text-center"
+                      className={cn("text-center", editableFieldClass)}
                     />
                   </td>
                   <td className="py-2">
@@ -695,7 +732,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                       step="0.01"
                       value={item.price || ''}
                       onChange={(e) => updateItem(item.id, { price: Number(e.target.value) || 0 })}
-                      className="text-center"
+                      className={cn("text-center", editableFieldClass)}
                       placeholder="0.00"
                     />
                   </td>
@@ -743,7 +780,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                 placeholder={t.serviceOrProductDesc}
                 value={item.description}
                 onChange={(e) => updateItem(item.id, { description: e.target.value })}
-                className="text-sm"
+                className={cn("text-sm", editableFieldClass)}
               />
               
               <div className="grid grid-cols-3 gap-2">
@@ -754,7 +791,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                     min="1"
                     value={item.quantity}
                     onChange={(e) => updateItem(item.id, { quantity: Number(e.target.value) || 1 })}
-                    className="text-center text-sm border border-input"
+                    className={cn("text-center text-sm border border-input", editableFieldClass)}
                   />
                 </div>
                 <div>
@@ -765,7 +802,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                     step="0.01"
                     value={item.price || ''}
                     onChange={(e) => updateItem(item.id, { price: Number(e.target.value) || 0 })}
-                    className="text-center text-sm border border-input"
+                    className={cn("text-center text-sm border border-input", editableFieldClass)}
                     placeholder="0"
                   />
                 </div>
@@ -805,7 +842,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                 min="0"
                 value={invoice.discount || ''}
                 onChange={(e) => updateInvoice('discount', Number(e.target.value) || 0)}
-                className="w-16 sm:w-20 text-center text-sm"
+                className={cn("w-16 sm:w-20 text-center text-sm", editableFieldClass)}
                 placeholder="0"
               />
               <Select
@@ -832,7 +869,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
               )}
             </div>
             
-            {/* Tax Toggle & Amount */}
+            {/* Tax Toggle & Rate (Percentage) */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -850,22 +887,29 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
               {invoice.taxEnabled && (
                 <div className="space-y-2 rounded-lg bg-muted/30 p-3">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground shrink-0">{t.taxAmount}:</span>
+                    <span className="text-sm text-muted-foreground shrink-0">{t.taxRate}:</span>
                     <GhostInput
                       type="number"
                       min="0"
-                      step="0.01"
-                      value={invoice.taxAmount || ''}
-                      onChange={(e) => updateInvoice('taxAmount', Number(e.target.value) || 0)}
-                      className="flex-1 text-center text-sm border border-input"
-                      placeholder={t.taxAmountPlaceholder}
+                      max="100"
+                      step="0.1"
+                      value={invoice.taxRate || ''}
+                      onChange={(e) => updateInvoice('taxRate', Number(e.target.value) || 0)}
+                      className={cn("w-20 text-center text-sm border border-input", editableFieldClass)}
+                      placeholder={t.taxRatePlaceholder}
                     />
+                    <Percent className="h-4 w-4 text-muted-foreground" />
+                    {totals.taxAmount > 0 && (
+                      <span className="text-sm mr-auto">
+                        = {formatCurrency(totals.taxAmount, invoice.currency)}
+                      </span>
+                    )}
                   </div>
                   <GhostInput
                     placeholder={t.taxNumberPlaceholder}
                     value={invoice.taxNumber}
                     onChange={(e) => updateInvoice('taxNumber', e.target.value)}
-                    className="text-sm border border-input font-mono"
+                    className={cn("text-sm border border-input font-mono", editableFieldClass)}
                   />
                 </div>
               )}
@@ -914,7 +958,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
                     max={totals.total}
                     value={invoice.amountPaid || ''}
                     onChange={(e) => updateInvoice('amountPaid', Number(e.target.value) || 0)}
-                    className="w-24 text-center text-sm border border-input"
+                    className={cn("w-24 text-center text-sm border border-input", editableFieldClass)}
                     placeholder="0"
                   />
                 </div>
@@ -966,7 +1010,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
             value={invoice.notes}
             onChange={(e) => updateInvoice('notes', e.target.value)}
             rows={3}
-            className="text-sm"
+            className={cn("text-sm", editableFieldClass)}
           />
         </div>
       </div>
@@ -976,6 +1020,30 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
         <p className="text-sm text-warning-foreground">
           {t.freeVersionWatermark} {t.removeWatermarkPrice}
         </p>
+      </div>
+      
+      {/* Floating Action Buttons - Mobile & Tablet */}
+      <div className="no-print fixed bottom-0 left-0 right-0 z-40 lg:hidden">
+        <div className="bg-card/95 backdrop-blur border-t p-4 shadow-lg">
+          <div className="flex items-center gap-3 max-w-4xl mx-auto">
+            <Button 
+              variant="outline" 
+              onClick={handleSave}
+              className="flex-1"
+            >
+              <Save className="ml-2 h-4 w-4" />
+              {t.save}
+            </Button>
+            <Button 
+              onClick={handleDownloadPdf} 
+              disabled={isGeneratingPdf}
+              className="flex-[2]"
+            >
+              <Download className="ml-2 h-4 w-4" />
+              {isGeneratingPdf ? t.downloading : t.downloadPdf}
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   )

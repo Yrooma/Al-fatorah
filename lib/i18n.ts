@@ -66,10 +66,10 @@ export interface Translations {
   
   // Tax
   tax: string
-  taxAmount: string
+  taxRate: string
   taxNumber: string
   addTax: string
-  taxAmountPlaceholder: string
+  taxRatePlaceholder: string
   taxNumberPlaceholder: string
   
   // Payment
@@ -201,10 +201,10 @@ const ar: Translations = {
   
   // Tax
   tax: 'ضريبة',
-  taxAmount: 'مبلغ الضريبة',
+  taxRate: 'نسبة الضريبة',
   taxNumber: 'الرقم الضريبي',
   addTax: 'إضافة ضريبة',
-  taxAmountPlaceholder: '0.00',
+  taxRatePlaceholder: '15',
   taxNumberPlaceholder: 'رقم التسجيل الضريبي (اختياري)',
   
   // Payment
@@ -266,7 +266,7 @@ const ar: Translations = {
   
   // Misc
   optional: 'اختياري',
-  imageTooLarge: 'حجم الصورة كبير جداً. الحد الأقصى 500KB',
+  imageTooLarge: 'حجم ا����صورة كبير جداً. الحد الأقصى 500KB',
   currency: 'العملة',
 }
 
@@ -336,10 +336,10 @@ const en: Translations = {
   
   // Tax
   tax: 'Tax',
-  taxAmount: 'Tax Amount',
+  taxRate: 'Tax Rate',
   taxNumber: 'Tax Number',
   addTax: 'Add Tax',
-  taxAmountPlaceholder: '0.00',
+  taxRatePlaceholder: '15',
   taxNumberPlaceholder: 'Tax registration number (optional)',
   
   // Payment
@@ -411,7 +411,17 @@ export function getTranslations(locale: Locale = 'ar'): Translations {
   return translations[locale]
 }
 
-// Hook for future React Context implementation
-export function useTranslations(locale: Locale = 'ar'): Translations {
-  return translations[locale]
+// Simple hook - returns translations and locale
+// In the future, this can be enhanced with React Context for dynamic locale switching
+export function useTranslation(defaultLocale: Locale = 'ar') {
+  const locale = defaultLocale
+  const t = (key: keyof Translations): string => {
+    return translations[locale][key]
+  }
+  
+  return {
+    t,
+    locale,
+    translations: translations[locale],
+  }
 }

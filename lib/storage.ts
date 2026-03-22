@@ -5,6 +5,8 @@ import { InvoiceData } from './types'
 const INVOICES_KEY = 'alfatoora_invoices'
 const SETTINGS_KEY = 'alfatoora_settings'
 
+import { RegulatoryNumber } from './types'
+
 export interface UserSettings {
   senderName: string
   senderAddress: string
@@ -14,7 +16,7 @@ export interface UserSettings {
   iban: string
   bankName: string
   accountHolder: string
-  freelanceDocNumber: string
+  regulatoryNumbers: RegulatoryNumber[]
   defaultCurrency: string
 }
 
@@ -71,7 +73,7 @@ const defaultSettings: UserSettings = {
   iban: '',
   bankName: '',
   accountHolder: '',
-  freelanceDocNumber: '',
+  regulatoryNumbers: [],
   defaultCurrency: 'SAR',
 }
 

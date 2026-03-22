@@ -5,14 +5,22 @@ export interface InvoiceItem {
   price: number
 }
 
+export interface RegulatoryNumber {
+  id: string
+  label: string
+  value: string
+}
+
 export interface InvoiceData {
   id: string
   invoiceNumber: string
   date: string
   dueDate: string
   showDueDate: boolean
-  freelanceDocNumber: string
   senderLogo: string
+  
+  // Regulatory Numbers (flexible - can be freelance doc, commercial register, etc.)
+  regulatoryNumbers: RegulatoryNumber[]
   
   // Sender Info
   senderName: string
@@ -37,8 +45,11 @@ export interface InvoiceData {
   // Calculations
   discount: number
   discountType: 'percentage' | 'fixed'
+  
+  // Tax (flexible amount, not percentage)
   taxEnabled: boolean
-  taxRate: number
+  taxAmount: number
+  taxNumber: string
   
   // Status
   paymentStatus: 'paid' | 'unpaid' | 'partial'
@@ -94,8 +105,9 @@ export function createEmptyInvoice(): InvoiceData {
     date: now.toISOString().split('T')[0],
     dueDate: dueDate.toISOString().split('T')[0],
     showDueDate: false,
-    freelanceDocNumber: '',
     senderLogo: '',
+    
+    regulatoryNumbers: [],
     
     senderName: '',
     senderAddress: '',
@@ -123,7 +135,8 @@ export function createEmptyInvoice(): InvoiceData {
     discount: 0,
     discountType: 'percentage',
     taxEnabled: false,
-    taxRate: 15,
+    taxAmount: 0,
+    taxNumber: '',
     
     paymentStatus: 'unpaid',
     amountPaid: 0,
@@ -152,9 +165,8 @@ export function calculateInvoiceTotals(invoice: InvoiceData) {
   
   const afterDiscount = subtotal - discountAmount
   
-  const taxAmount = invoice.taxEnabled
-    ? (afterDiscount * invoice.taxRate) / 100
-    : 0
+  // Tax is now a fixed amount, not percentage
+  const taxAmount = invoice.taxEnabled ? invoice.taxAmount : 0
   
   const total = afterDiscount + taxAmount
   

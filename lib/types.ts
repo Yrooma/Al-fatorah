@@ -46,9 +46,9 @@ export interface InvoiceData {
   discount: number
   discountType: 'percentage' | 'fixed'
   
-  // Tax (flexible amount, not percentage)
+  // Tax (percentage-based)
   taxEnabled: boolean
-  taxAmount: number
+  taxRate: number
   taxNumber: string
   
   // Status
@@ -135,7 +135,7 @@ export function createEmptyInvoice(): InvoiceData {
     discount: 0,
     discountType: 'percentage',
     taxEnabled: false,
-    taxAmount: 0,
+    taxRate: 15,
     taxNumber: '',
     
     paymentStatus: 'unpaid',
@@ -165,8 +165,10 @@ export function calculateInvoiceTotals(invoice: InvoiceData) {
   
   const afterDiscount = subtotal - discountAmount
   
-  // Tax is now a fixed amount, not percentage
-  const taxAmount = invoice.taxEnabled ? invoice.taxAmount : 0
+  // Tax is calculated as percentage
+  const taxAmount = invoice.taxEnabled
+    ? (afterDiscount * invoice.taxRate) / 100
+    : 0
   
   const total = afterDiscount + taxAmount
   

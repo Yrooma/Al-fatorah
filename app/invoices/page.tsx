@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { Empty } from '@/components/ui/empty'
 import { getInvoices, deleteInvoice } from '@/lib/storage'
 import { InvoiceData, calculateInvoiceTotals, formatCurrency } from '@/lib/types'
-import { useTranslation } from '@/lib/i18n'
+import { useLanguage } from '@/lib/language-context'
 import { cn } from '@/lib/utils'
 import { 
   FileText, 
@@ -36,7 +36,7 @@ import {
 } from '@/components/ui/alert-dialog'
 
 export default function InvoicesPage() {
-  const { t, locale } = useTranslation()
+  const { t, locale } = useLanguage()
   const router = useRouter()
   const [invoices, setInvoices] = React.useState<InvoiceData[]>([])
   const [searchQuery, setSearchQuery] = React.useState('')
@@ -57,14 +57,14 @@ export default function InvoicesPage() {
   const handleDelete = (id: string) => {
     deleteInvoice(id)
     setInvoices(getInvoices())
-    showMessage(t('invoiceDeleted'))
+    showMessage(t.invoiceDeleted)
   }
   
   const handleDownload = async (invoice: InvoiceData) => {
     try {
       const { generatePDF } = await import('@/lib/pdf-generator')
       await generatePDF(invoice, false)
-      showMessage(t('invoiceDownloaded'))
+      showMessage(t.invoiceDownloaded)
     } catch {
       showMessage(locale === 'ar' ? 'حدث خطأ أثناء تحميل الفاتورة' : 'Error downloading invoice')
     }
@@ -94,11 +94,11 @@ export default function InvoicesPage() {
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'paid':
-        return t('paid')
+        return t.paid
       case 'partial':
-        return t('partial')
+        return t.partial
       default:
-        return t('unpaid')
+        return t.unpaid
     }
   }
   
@@ -150,7 +150,7 @@ export default function InvoicesPage() {
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">{t('myInvoices')}</h1>
+            <h1 className="text-2xl font-bold text-foreground">{t.myInvoices}</h1>
             <p className="text-muted-foreground mt-1">
               {locale === 'ar' 
                 ? `${invoices.length} فاتورة محفوظة` 
@@ -161,7 +161,7 @@ export default function InvoicesPage() {
           <Link href="/">
             <Button className="gap-2">
               <Plus className="h-4 w-4" />
-              {t('newInvoice')}
+              {t.newInvoice}
             </Button>
           </Link>
         </div>
@@ -212,8 +212,8 @@ export default function InvoicesPage() {
             action={
               <Link href="/">
                 <Button className="gap-2">
-                  <Plus className="h-4 w-4" />
-                  {t('newInvoice')}
+                <Plus className="h-4 w-4" />
+                {t.newInvoice}
                 </Button>
               </Link>
             }

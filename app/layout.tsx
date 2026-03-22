@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { IBM_Plex_Sans_Arabic, IBM_Plex_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
-import { Toaster } from '@/components/ui/sonner'
+import { LanguageProvider } from '@/lib/language-context'
 import './globals.css'
 
 const ibmPlexArabic = IBM_Plex_Sans_Arabic({
@@ -59,10 +59,11 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="ar" dir="rtl">
+    <html lang="ar" dir="rtl" suppressHydrationWarning>
       <body className={`${ibmPlexArabic.variable} ${ibmPlexMono.variable} font-sans antialiased`}>
-        {children}
-        <Toaster position="top-center" richColors />
+        <LanguageProvider>
+          {children}
+        </LanguageProvider>
         <Analytics />
       </body>
     </html>

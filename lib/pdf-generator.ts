@@ -428,7 +428,7 @@ export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean): str
               invoice.taxEnabled && totals.taxAmount > 0
                 ? `
             <div class="total-row">
-              <span>الضريبة</span>
+              <span>الضريبة (${invoice.taxRate}%)</span>
               <span>${formatCurrency(totals.taxAmount, invoice.currency)}</span>
             </div>
             `
@@ -484,7 +484,7 @@ export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean): str
   `
 }
 
-export async function generatePDF(invoice: InvoiceData, hasPaid: boolean = false): Promise<void> {
+export async function generatePDF(invoice: InvoiceData, hasPaid: boolean = false): Promise<boolean> {
   const html = generateInvoiceHTML(invoice, hasPaid)
   
   // Create hidden iframe for rendering
@@ -498,7 +498,7 @@ export async function generatePDF(invoice: InvoiceData, hasPaid: boolean = false
   const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document
   if (!iframeDoc) {
     document.body.removeChild(iframe)
-    throw new Error('Could not access iframe document')
+    return false
   }
   
   iframeDoc.open()
@@ -566,7 +566,12 @@ export async function generatePDF(invoice: InvoiceData, hasPaid: boolean = false
     pdf.addImage(imgData, 'JPEG', imgX, imgY, finalWidth, finalHeight)
     
     pdf.save(`${invoice.invoiceNumber}.pdf`)
-  } finally {
+    
     document.body.removeChild(iframe)
+    return true
+  } catch (error) {
+    console.error('PDF generation error:', error)
+    document.body.removeChild(iframe)
+    return false
   }
 }

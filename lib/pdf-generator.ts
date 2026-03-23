@@ -2,7 +2,6 @@
 
 import { InvoiceData, calculateInvoiceTotals, currencies } from './types'
 import { Locale } from './i18n'
-import { shouldShowWatermark } from './subscription'
 
 // RTL languages
 const RTL_LANGUAGES: Locale[] = ['ar', 'ur']
@@ -22,9 +21,7 @@ function formatDate(dateStr: string, locale: Locale = 'ar'): string {
   })
 }
 
-export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean = false, locale: Locale = 'ar'): string {
-  // Check subscription status for watermark (hasPaid overrides if explicitly true)
-  const showWatermark = hasPaid ? false : shouldShowWatermark()
+export function generateInvoiceHTML(invoice: InvoiceData, showWatermark: boolean = true, locale: Locale = 'ar'): string {
   const isRTL = RTL_LANGUAGES.includes(locale)
   const dir = isRTL ? 'rtl' : 'ltr'
   const textAlign = isRTL ? 'right' : 'left'
@@ -527,8 +524,8 @@ export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean = fal
   `
 }
 
-export async function generatePDF(invoice: InvoiceData, hasPaid: boolean = false, locale: Locale = 'ar'): Promise<boolean> {
-  const html = generateInvoiceHTML(invoice, hasPaid, locale)
+export async function generatePDF(invoice: InvoiceData, showWatermark: boolean = true, locale: Locale = 'ar'): Promise<boolean> {
+  const html = generateInvoiceHTML(invoice, showWatermark, locale)
   
   // Create hidden iframe for rendering
   const iframe = document.createElement('iframe')

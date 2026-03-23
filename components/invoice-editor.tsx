@@ -260,7 +260,7 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
       const { generatePDF } = await import('@/lib/pdf-generator')
       
       // Generate and download PDF
-      const success = await generatePDF(invoice, false, locale)
+      const success = await generatePDF(invoice, true, locale)
       
       if (success) {
         // Small delay to ensure download started

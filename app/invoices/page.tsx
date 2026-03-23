@@ -63,7 +63,7 @@ export default function InvoicesPage() {
   const handleDownload = async (invoice: InvoiceData) => {
     try {
       const { generatePDF } = await import('@/lib/pdf-generator')
-      await generatePDF(invoice, false, locale)
+      await generatePDF(invoice, true, locale)
       showMessage(t.invoiceDownloaded)
     } catch {
       showMessage(locale === 'ar' ? 'حدث خطأ أثناء تحميل الفاتورة' : 'Error downloading invoice')

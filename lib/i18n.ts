@@ -133,6 +133,11 @@ export interface Translations {
   optional: string
   imageTooLarge: string
   currency: string
+  
+  // Errors
+  invoiceNotFound: string
+  invoiceNotFoundDesc: string
+  backToInvoices: string
 }
 
 const ar: Translations = {
@@ -268,6 +273,11 @@ const ar: Translations = {
   optional: 'اختياري',
   imageTooLarge: 'حجم الصورة كبير جداً. الحد الأقصى 500KB',
   currency: 'العملة',
+  
+  // Errors
+  invoiceNotFound: 'الفاتورة غير موجودة',
+  invoiceNotFoundDesc: 'لم يتم العثور على الفاتورة المطلوبة',
+  backToInvoices: 'العودة للفواتير',
 }
 
 const en: Translations = {
@@ -388,6 +398,11 @@ const en: Translations = {
   optional: 'optional',
   imageTooLarge: 'Image too large. Max size is 500KB',
   currency: 'Currency',
+  
+  // Errors
+  invoiceNotFound: 'Invoice not found',
+  invoiceNotFoundDesc: 'The requested invoice could not be found',
+  backToInvoices: 'Back to Invoices',
 }
 
 const es: Translations = {
@@ -492,6 +507,9 @@ const es: Translations = {
   optional: 'opcional',
   imageTooLarge: 'Imagen demasiado grande. Máx 500KB',
   currency: 'Moneda',
+  invoiceNotFound: 'Factura no encontrada',
+  invoiceNotFoundDesc: 'No se pudo encontrar la factura solicitada',
+  backToInvoices: 'Volver a Facturas',
 }
 
 const fr: Translations = {
@@ -596,6 +614,9 @@ const fr: Translations = {
   optional: 'optionnel',
   imageTooLarge: 'Image trop grande. Max 500KB',
   currency: 'Devise',
+  invoiceNotFound: 'Facture introuvable',
+  invoiceNotFoundDesc: 'La facture demandée est introuvable',
+  backToInvoices: 'Retour aux factures',
 }
 
 const zh: Translations = {
@@ -700,6 +721,9 @@ const zh: Translations = {
   optional: '可选',
   imageTooLarge: '图片过大。最大 500KB',
   currency: '货币',
+  invoiceNotFound: '发票未找到',
+  invoiceNotFoundDesc: '未找到请求的发票',
+  backToInvoices: '返回发票',
 }
 
 const ru: Translations = {
@@ -804,6 +828,9 @@ const ru: Translations = {
   optional: 'необязательно',
   imageTooLarge: 'Изображение слишком большое. Макс. 500KB',
   currency: 'Валюта',
+  invoiceNotFound: 'Счет не найден',
+  invoiceNotFoundDesc: 'Запрошенный счет не найден',
+  backToInvoices: 'Вернуться к счетам',
 }
 
 const hi: Translations = {
@@ -892,7 +919,7 @@ const hi: Translations = {
   deleteInvoiceConfirm: 'क्या आप वाकई इस चालान को हटाना चाहते हैं? इसे वापस नहीं लाया जा सकता।',
   invoiceDeleted: 'चालान हटा दिया गया',
   invoiceCreatedSuccess: 'चालान सफलतापूर्वक बन गया!',
-  invoiceDownloadedTo: 'चालान आपके डाउनलोड फ़ोल्डर में डाउनलोड हो गया है',
+  invoiceDownloadedTo: 'चालान आपके डाउनलोड फ़ोल्डर में डाउनलोड ह�� गया है',
   invoiceSavedLocally: 'भविष्य के लिए "मेरे चालान" में एक प्रति सहेज ली गई है',
   editInvoice: 'चालान संपादित करें',
   viewInvoices: 'मेरे चालान देखें',
@@ -908,6 +935,9 @@ const hi: Translations = {
   optional: 'वैकल्पिक',
   imageTooLarge: 'छवि बहुत बड़ी है। अधिकतम आकार 500KB',
   currency: 'मुद्रा',
+  invoiceNotFound: 'चालान नहीं मिला',
+  invoiceNotFoundDesc: 'अनुरोधित चालान नहीं मिला',
+  backToInvoices: 'चालान पर वापस जाएं',
 }
 
 const it: Translations = {
@@ -1011,7 +1041,10 @@ const it: Translations = {
   removeWatermarkPrice: 'Rimuovila per soli $0.50.',
   optional: 'opzionale',
   imageTooLarge: 'Immagine troppo grande. Max 500KB',
-  currency: 'Valuta'
+  currency: 'Valuta',
+  invoiceNotFound: 'Fattura non trovata',
+  invoiceNotFoundDesc: 'La fattura richiesta non è stata trovata',
+  backToInvoices: 'Torna alle fatture',
 }
 
 const pt: Translations = {
@@ -1115,7 +1148,10 @@ const pt: Translations = {
   removeWatermarkPrice: 'Remova por apenas $0.50.',
   optional: 'opcional',
   imageTooLarge: 'Imagem muito grande. Máx 500KB',
-  currency: 'Moeda'
+  currency: 'Moeda',
+  invoiceNotFound: 'Fatura não encontrada',
+  invoiceNotFoundDesc: 'A fatura solicitada não foi encontrada',
+  backToInvoices: 'Voltar às faturas',
 }
 
 const ur: Translations = {
@@ -1219,7 +1255,10 @@ const ur: Translations = {
   removeWatermarkPrice: 'اسے صرف $0.50 میں ہٹائیں۔',
   optional: 'اختیاری',
   imageTooLarge: 'تصویر بہت بڑی ہے۔ زیادہ سے زیادہ سائز 500KB',
-  currency: 'کرنسی'
+  currency: 'کرنسی',
+  invoiceNotFound: 'انوائس نہیں ملا',
+  invoiceNotFoundDesc: 'درخواست کردہ انوائس نہیں ملا',
+  backToInvoices: 'انوائسز پر واپس جائیں',
 }
 
 const tr: Translations = {
@@ -1323,7 +1362,10 @@ const tr: Translations = {
   removeWatermarkPrice: 'Sadece 0.50$ karşılığında kaldırın.',
   optional: 'isteğe bağlı',
   imageTooLarge: 'Görüntü çok büyük. Maksimum boyut 500KB',
-  currency: 'Para Birimi'
+  currency: 'Para Birimi',
+  invoiceNotFound: 'Fatura bulunamadı',
+  invoiceNotFoundDesc: 'İstenen fatura bulunamadı',
+  backToInvoices: 'Faturalara geri dön',
 }
 
 const sw: Translations = {
@@ -1427,7 +1469,10 @@ const sw: Translations = {
   removeWatermarkPrice: 'Iondoe kwa $0.50 tu.',
   optional: 'hiari',
   imageTooLarge: 'Picha ni kubwa mno. Upeo ni 500KB',
-  currency: 'Sarafu'
+  currency: 'Sarafu',
+  invoiceNotFound: 'Ankara haijapatikana',
+  invoiceNotFoundDesc: 'Ankara iliyoombwa haijapatikana',
+  backToInvoices: 'Rudi kwa Ankara',
 }
 
 export const translations: Record<Locale, Translations> = { ar, en, es, fr, zh, ru, hi, it, pt, ur, tr, sw }

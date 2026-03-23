@@ -126,19 +126,19 @@ export default function SuccessPage() {
           <div className="mb-12 flex flex-col gap-3 sm:flex-row sm:justify-center">
             <Link href={`/invoice/${invoice.id}`}>
               <Button variant="outline" className="w-full sm:w-auto">
-                <Edit className="ml-2 h-4 w-4" />
+                <Edit className="me-2 h-4 w-4" />
                 {t.editInvoice}
               </Button>
             </Link>
             <Link href="/invoices">
               <Button variant="outline" className="w-full sm:w-auto">
-                <FolderOpen className="ml-2 h-4 w-4" />
+                <FolderOpen className="me-2 h-4 w-4" />
                 {t.viewInvoices}
               </Button>
             </Link>
             <Link href="/">
               <Button className="w-full sm:w-auto">
-                <Plus className="ml-2 h-4 w-4" />
+                <Plus className="me-2 h-4 w-4" />
                 {t.createNewInvoice}
               </Button>
             </Link>

@@ -1,21 +1,33 @@
 'use client'
 
 import { InvoiceData, calculateInvoiceTotals, currencies } from './types'
+import { Locale } from './i18n'
 
-function formatCurrency(amount: number, currencyCode: string): string {
+// RTL languages
+const RTL_LANGUAGES: Locale[] = ['ar', 'ur']
+
+function formatCurrency(amount: number, currencyCode: string, locale: Locale = 'ar'): string {
   const currency = currencies.find(c => c.code === currencyCode) || currencies[0]
-  return `${amount.toLocaleString('ar-SA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency.symbol}`
+  const localeCode = locale === 'ar' || locale === 'ur' ? 'ar-SA' : 'en-US'
+  return `${amount.toLocaleString(localeCode, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency.symbol}`
 }
 
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('ar-SA', {
+function formatDate(dateStr: string, locale: Locale = 'ar'): string {
+  const localeCode = locale === 'ar' || locale === 'ur' ? 'ar-SA' : 'en-US'
+  return new Date(dateStr).toLocaleDateString(localeCode, {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   })
 }
 
-export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean): string {
+export function generateInvoiceHTML(invoice: InvoiceData, showWatermark: boolean = true, locale: Locale = 'ar'): string {
+  const isRTL = RTL_LANGUAGES.includes(locale)
+  const dir = isRTL ? 'rtl' : 'ltr'
+  const textAlign = isRTL ? 'right' : 'left'
+  const textAlignOpposite = isRTL ? 'left' : 'right'
+  const marginStart = isRTL ? 'margin-right' : 'margin-left'
+  const marginEnd = isRTL ? 'margin-left' : 'margin-right'
   const totals = calculateInvoiceTotals(invoice)
   
   const itemsHTML = invoice.items
@@ -24,14 +36,14 @@ export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean): str
         <tr>
           <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb;">${item.description || '—'}</td>
           <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; text-align: center;">${item.quantity}</td>
-          <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; text-align: center;">${formatCurrency(item.price, invoice.currency)}</td>
-          <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; text-align: left;">${formatCurrency(item.quantity * item.price, invoice.currency)}</td>
+          <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; text-align: center;">${formatCurrency(item.price, invoice.currency, locale)}</td>
+          <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; text-align: ${textAlignOpposite};">${formatCurrency(item.quantity * item.price, invoice.currency, locale)}</td>
         </tr>
       `
     )
     .join('')
 
-  const watermarkCSS = !hasPaid
+  const watermarkCSS = showWatermark
     ? `
       .watermark {
         position: fixed;
@@ -48,12 +60,12 @@ export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean): str
     `
     : ''
 
-  const watermarkHTML = !hasPaid
-    ? '<div class="watermark">الفاتورة.io</div>'
+  const watermarkHTML = showWatermark
+    ? '<div class="watermark">Alfatoora.io</div>'
     : ''
 
   const logoHTML = invoice.senderLogo 
-    ? `<img src="${invoice.senderLogo}" alt="Logo" style="height: 60px; width: auto; max-width: 150px; object-fit: contain; margin-left: 16px;" crossorigin="anonymous" />`
+    ? `<img src="${invoice.senderLogo}" alt="Logo" style="height: 60px; width: auto; max-width: 150px; object-fit: contain; ${marginEnd}: 16px;" crossorigin="anonymous" />`
     : ''
 
   // Generate regulatory numbers HTML
@@ -71,21 +83,49 @@ export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean): str
   const taxNumberHTML = invoice.taxEnabled && invoice.taxNumber
     ? `
       <div class="meta-item">
-        <span class="meta-label">الرقم الضريبي:</span>
+        <span class="meta-label">${labels.taxNumber}:</span>
         <span class="meta-value mono">${invoice.taxNumber}</span>
       </div>
     `
     : ''
 
+  // Localized labels
+  const labels = {
+    invoice: isRTL ? 'فاتورة' : 'Invoice',
+    invoiceNumber: isRTL ? 'رقم الفاتورة' : 'Invoice #',
+    date: isRTL ? 'التاريخ' : 'Date',
+    dueDate: isRTL ? 'تاريخ الاستحقاق' : 'Due Date',
+    from: isRTL ? 'من' : 'From',
+    to: isRTL ? 'إلى' : 'To',
+    description: isRTL ? 'الوصف' : 'Description',
+    quantity: isRTL ? 'الكمية' : 'Qty',
+    price: isRTL ? 'السعر' : 'Price',
+    total: isRTL ? 'المجموع' : 'Total',
+    subtotal: isRTL ? 'المجموع الفرعي' : 'Subtotal',
+    discount: isRTL ? 'خصم' : 'Discount',
+    tax: isRTL ? 'ضريبة' : 'Tax',
+    taxNumber: isRTL ? 'الرقم الضريبي' : 'Tax Number',
+    grandTotal: isRTL ? 'الإجمالي' : 'Grand Total',
+    paid: isRTL ? 'مدفوعة' : 'Paid',
+    unpaid: isRTL ? 'غير مدفوعة' : 'Unpaid',
+    partial: isRTL ? 'جزئية' : 'Partial',
+    amountDue: isRTL ? 'المبلغ المطلوب' : 'Amount Due',
+    bankInfo: isRTL ? 'معلومات الحساب البنكي' : 'Bank Account Info',
+    bankName: isRTL ? 'البنك' : 'Bank',
+    accountHolder: isRTL ? 'صاحب الحساب' : 'Account Holder',
+    iban: 'IBAN',
+    notes: isRTL ? 'ملاحظات' : 'Notes',
+  }
+
   return `
     <!DOCTYPE html>
-    <html lang="ar" dir="rtl">
+    <html lang="${locale}" dir="${dir}">
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>فاتورة ${invoice.invoiceNumber}</title>
+      <title>${labels.invoice} ${invoice.invoiceNumber}</title>
       <style>
-        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap');
         
         * {
           margin: 0;
@@ -94,13 +134,13 @@ export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean): str
         }
         
         body {
-          font-family: 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
+          font-family: ${isRTL ? "'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif" : "'Inter', 'Segoe UI', Tahoma, sans-serif"};
           font-size: 14px;
           line-height: 1.6;
           color: #1f2937;
           background: white;
           padding: 40px;
-          direction: rtl;
+          direction: ${dir};
         }
         
         .mono {
@@ -142,7 +182,7 @@ export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean): str
         }
         
         .meta {
-          text-align: left;
+          text-align: ${textAlignOpposite};
         }
         
         .meta-item {
@@ -202,7 +242,7 @@ export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean): str
         th {
           background: #f3f4f6;
           padding: 12px 16px;
-          text-align: right;
+          text-align: ${textAlign};
           font-weight: 600;
           font-size: 12px;
           color: #6b7280;
@@ -215,12 +255,12 @@ export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean): str
         }
         
         th:nth-child(4) {
-          text-align: left;
+          text-align: ${textAlignOpposite};
         }
         
         .totals {
           display: flex;
-          justify-content: flex-start;
+          justify-content: ${isRTL ? 'flex-start' : 'flex-end'};
           margin-bottom: 32px;
         }
         
@@ -348,30 +388,30 @@ export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean): str
           <div class="header-right">
             ${logoHTML}
             <div>
-              <h1 class="title">فاتورة</h1>
-              <p class="title-en">Invoice</p>
+              <h1 class="title">${labels.invoice}</h1>
+              <p class="title-en">${isRTL ? 'Invoice' : ''}</p>
             </div>
           </div>
           <div class="meta">
             <div class="meta-item">
-              <span class="meta-label">رقم الفاتورة:</span>
+              <span class="meta-label">${labels.invoiceNumber}:</span>
               <span class="meta-value mono">${invoice.invoiceNumber}</span>
             </div>
             <div class="meta-item">
-              <span class="meta-label">التاريخ:</span>
-              <span class="meta-value">${formatDate(invoice.date)}</span>
+              <span class="meta-label">${labels.date}:</span>
+              <span class="meta-value">${formatDate(invoice.date, locale)}</span>
             </div>
             ${invoice.showDueDate ? `
             <div class="meta-item">
-              <span class="meta-label">تاريخ الاستحقاق:</span>
-              <span class="meta-value">${formatDate(invoice.dueDate)}</span>
+              <span class="meta-label">${labels.dueDate}:</span>
+              <span class="meta-value">${formatDate(invoice.dueDate, locale)}</span>
             </div>
             ` : ''}
             ${regulatoryNumbersHTML}
             ${taxNumberHTML}
             <div class="meta-item" style="margin-top: 8px;">
               <span class="status-badge status-${invoice.paymentStatus}">
-                ${invoice.paymentStatus === 'paid' ? 'مدفوعة' : invoice.paymentStatus === 'partial' ? 'مدفوعة جزئياً' : 'غير مدفوعة'}
+                ${invoice.paymentStatus === 'paid' ? labels.paid : invoice.paymentStatus === 'partial' ? labels.partial : labels.unpaid}
               </span>
             </div>
           </div>
@@ -379,28 +419,28 @@ export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean): str
         
         <div class="parties">
           <div class="party">
-            <div class="party-title">من</div>
+            <div class="party-title">${labels.from}</div>
             <div class="party-name">${invoice.senderName || '—'}</div>
             ${invoice.senderAddress ? `<div class="party-detail">${invoice.senderAddress}</div>` : ''}
-            ${invoice.senderPhone ? `<div class="party-detail mono" dir="ltr" style="text-align: right;">${invoice.senderPhone}</div>` : ''}
-            ${invoice.senderEmail ? `<div class="party-detail mono" dir="ltr" style="text-align: right;">${invoice.senderEmail}</div>` : ''}
+            ${invoice.senderPhone ? `<div class="party-detail mono" dir="ltr" style="text-align: ${textAlign};">${invoice.senderPhone}</div>` : ''}
+            ${invoice.senderEmail ? `<div class="party-detail mono" dir="ltr" style="text-align: ${textAlign};">${invoice.senderEmail}</div>` : ''}
           </div>
           <div class="party">
-            <div class="party-title">إلى</div>
+            <div class="party-title">${labels.to}</div>
             <div class="party-name">${invoice.clientName || '—'}</div>
             ${invoice.clientAddress ? `<div class="party-detail">${invoice.clientAddress}</div>` : ''}
-            ${invoice.clientPhone ? `<div class="party-detail mono" dir="ltr" style="text-align: right;">${invoice.clientPhone}</div>` : ''}
-            ${invoice.clientEmail ? `<div class="party-detail mono" dir="ltr" style="text-align: right;">${invoice.clientEmail}</div>` : ''}
+            ${invoice.clientPhone ? `<div class="party-detail mono" dir="ltr" style="text-align: ${textAlign};">${invoice.clientPhone}</div>` : ''}
+            ${invoice.clientEmail ? `<div class="party-detail mono" dir="ltr" style="text-align: ${textAlign};">${invoice.clientEmail}</div>` : ''}
           </div>
         </div>
         
         <table>
           <thead>
             <tr>
-              <th>الوصف</th>
-              <th>الكمية</th>
-              <th>السعر</th>
-              <th>المجموع</th>
+              <th>${labels.description}</th>
+              <th>${labels.quantity}</th>
+              <th>${labels.price}</th>
+              <th>${labels.total}</th>
             </tr>
           </thead>
           <tbody>
@@ -411,15 +451,15 @@ export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean): str
         <div class="totals">
           <div class="totals-box">
             <div class="total-row">
-              <span>المجموع الفرعي</span>
-              <span>${formatCurrency(totals.subtotal, invoice.currency)}</span>
+              <span>${labels.subtotal}</span>
+              <span>${formatCurrency(totals.subtotal, invoice.currency, locale)}</span>
             </div>
             ${
               invoice.discount > 0
                 ? `
             <div class="total-row discount">
-              <span>الخصم ${invoice.discountType === 'percentage' ? `(${invoice.discount}%)` : ''}</span>
-              <span>-${formatCurrency(totals.discountAmount, invoice.currency)}</span>
+              <span>${labels.discount} ${invoice.discountType === 'percentage' ? `(${invoice.discount}%)` : ''}</span>
+              <span>-${formatCurrency(totals.discountAmount, invoice.currency, locale)}</span>
             </div>
             `
                 : ''
@@ -428,22 +468,22 @@ export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean): str
               invoice.taxEnabled && totals.taxAmount > 0
                 ? `
             <div class="total-row">
-              <span>الضريبة (${invoice.taxRate}%)</span>
-              <span>${formatCurrency(totals.taxAmount, invoice.currency)}</span>
+              <span>${labels.tax} (${invoice.taxRate}%)</span>
+              <span>${formatCurrency(totals.taxAmount, invoice.currency, locale)}</span>
             </div>
             `
                 : ''
             }
             <div class="total-row final">
-              <span>الإجمالي</span>
-              <span>${formatCurrency(totals.total, invoice.currency)}</span>
+              <span>${labels.grandTotal}</span>
+              <span>${formatCurrency(totals.total, invoice.currency, locale)}</span>
             </div>
             ${
               invoice.paymentStatus !== 'paid'
                 ? `
             <div class="amount-due">
-              <div class="amount-due-label">المبلغ المطلوب للدفع</div>
-              <div class="amount-due-value">${formatCurrency(totals.amountDue, invoice.currency)}</div>
+              <div class="amount-due-label">${labels.amountDue}</div>
+              <div class="amount-due-value">${formatCurrency(totals.amountDue, invoice.currency, locale)}</div>
             </div>
             `
                 : ''
@@ -455,10 +495,10 @@ export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean): str
           invoice.iban || invoice.bankName
             ? `
         <div class="bank-info">
-          <div class="bank-title">معلومات الحساب البنكي</div>
-          ${invoice.bankName ? `<div class="bank-row"><span class="bank-label">البنك:</span><span>${invoice.bankName}</span></div>` : ''}
-          ${invoice.accountHolder ? `<div class="bank-row"><span class="bank-label">اسم صاحب الحساب:</span><span>${invoice.accountHolder}</span></div>` : ''}
-          ${invoice.iban ? `<div class="bank-row"><span class="bank-label">IBAN:</span><span class="iban" dir="ltr">${invoice.iban}</span></div>` : ''}
+          <div class="bank-title">${labels.bankInfo}</div>
+          ${invoice.bankName ? `<div class="bank-row"><span class="bank-label">${labels.bankName}:</span><span>${invoice.bankName}</span></div>` : ''}
+          ${invoice.accountHolder ? `<div class="bank-row"><span class="bank-label">${labels.accountHolder}:</span><span>${invoice.accountHolder}</span></div>` : ''}
+          ${invoice.iban ? `<div class="bank-row"><span class="bank-label">${labels.iban}:</span><span class="iban" dir="ltr">${invoice.iban}</span></div>` : ''}
         </div>
         `
             : ''
@@ -468,7 +508,7 @@ export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean): str
           invoice.notes
             ? `
         <div class="notes">
-          <div class="notes-title">ملاحظات</div>
+          <div class="notes-title">${labels.notes}</div>
           <div>${invoice.notes}</div>
         </div>
         `
@@ -476,7 +516,7 @@ export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean): str
         }
         
         <div class="footer">
-          تم إنشاء هذه الفاتورة باستخدام الفاتورة.io
+          ${isRTL ? 'تم إنشاء هذه الفاتورة باستخدام الفاتورة.io' : 'Created with Alfatoora.io'}
         </div>
       </div>
     </body>
@@ -484,8 +524,8 @@ export function generateInvoiceHTML(invoice: InvoiceData, hasPaid: boolean): str
   `
 }
 
-export async function generatePDF(invoice: InvoiceData, hasPaid: boolean = false): Promise<boolean> {
-  const html = generateInvoiceHTML(invoice, hasPaid)
+export async function generatePDF(invoice: InvoiceData, showWatermark: boolean = true, locale: Locale = 'ar'): Promise<boolean> {
+  const html = generateInvoiceHTML(invoice, showWatermark, locale)
   
   // Create hidden iframe for rendering
   const iframe = document.createElement('iframe')

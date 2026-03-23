@@ -1,72 +1,35 @@
 import { MetadataRoute } from 'next'
+import { locales } from '@/lib/i18n-config'
 
-const locales = ['ar', 'en', 'es', 'fr', 'zh', 'ru', 'hi', 'it', 'pt', 'ur', 'tr', 'sw']
+const baseUrl = 'https://alfatoora.io'
+const pages = ['', '/invoices', '/about', '/privacy', '/terms']
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://alfatoora.io'
-  const now = new Date()
+  const entries: MetadataRoute.Sitemap = []
   
-  // Main pages
-  const mainPages = [
-    {
-      url: baseUrl,
-      lastModified: now,
-      changeFrequency: 'daily' as const,
-      priority: 1,
-    },
-    {
-      url: `${baseUrl}/invoices`,
-      lastModified: now,
-      changeFrequency: 'daily' as const,
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/about`,
-      lastModified: now,
-      changeFrequency: 'monthly' as const,
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/privacy`,
-      lastModified: now,
-      changeFrequency: 'monthly' as const,
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/terms`,
-      lastModified: now,
-      changeFrequency: 'monthly' as const,
-      priority: 0.5,
-    },
-  ]
+  // Generate entries for each language and page
+  for (const locale of locales) {
+    for (const page of pages) {
+      const url = `${baseUrl}/${locale}${page}`
+      
+      // Build language alternates
+      const languages: Record<string, string> = {}
+      for (const lang of locales) {
+        languages[lang] = `${baseUrl}/${lang}${page}`
+      }
+      languages['x-default'] = `${baseUrl}/en${page}`
+      
+      entries.push({
+        url,
+        lastModified: new Date(),
+        changeFrequency: page === '' ? 'daily' : 'weekly',
+        priority: page === '' ? 1.0 : page === '/about' ? 0.8 : 0.6,
+        alternates: {
+          languages,
+        },
+      })
+    }
+  }
   
-  // Generate language-specific URLs for main pages
-  const languagePages = locales.flatMap(locale => [
-    {
-      url: `${baseUrl}?lang=${locale}`,
-      lastModified: now,
-      changeFrequency: 'daily' as const,
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/about?lang=${locale}`,
-      lastModified: now,
-      changeFrequency: 'monthly' as const,
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/privacy?lang=${locale}`,
-      lastModified: now,
-      changeFrequency: 'monthly' as const,
-      priority: 0.4,
-    },
-    {
-      url: `${baseUrl}/terms?lang=${locale}`,
-      lastModified: now,
-      changeFrequency: 'monthly' as const,
-      priority: 0.4,
-    },
-  ])
-  
-  return [...mainPages, ...languagePages]
+  return entries
 }

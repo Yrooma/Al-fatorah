@@ -1,16 +1,20 @@
 'use client'
 
 import Link from 'next/link'
-import { useLanguage } from '@/lib/language-context'
+import { type Locale, isRTL as checkRTL } from '@/lib/i18n-config'
 import { cn } from '@/lib/utils'
 
-export function Footer() {
-  const { isRTL } = useLanguage()
+interface FooterProps {
+  lang?: Locale
+}
+
+export function Footer({ lang = 'en' }: FooterProps) {
+  const isRTL = checkRTL(lang)
   
   const links = [
-    { href: '/about', labelAr: 'حول', labelEn: 'About' },
-    { href: '/privacy', labelAr: 'الخصوصية', labelEn: 'Privacy' },
-    { href: '/terms', labelAr: 'الشروط', labelEn: 'Terms' },
+    { href: `/${lang}/about`, labelAr: 'حول', labelEn: 'About' },
+    { href: `/${lang}/privacy`, labelAr: 'الخصوصية', labelEn: 'Privacy' },
+    { href: `/${lang}/terms`, labelAr: 'الشروط', labelEn: 'Terms' },
   ]
   
   return (

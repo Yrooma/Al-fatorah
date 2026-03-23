@@ -21,7 +21,7 @@ function formatDate(dateStr: string, locale: Locale = 'ar'): string {
   })
 }
 
-export function generateInvoiceHTML(invoice: InvoiceData, showWatermark: boolean = true, locale: Locale = 'ar'): string {
+export function generateInvoiceHTML(invoice: InvoiceData, _showWatermark: boolean = false, locale: Locale = 'ar'): string {
   const isRTL = RTL_LANGUAGES.includes(locale)
   const dir = isRTL ? 'rtl' : 'ltr'
   const textAlign = isRTL ? 'right' : 'left'
@@ -43,26 +43,29 @@ export function generateInvoiceHTML(invoice: InvoiceData, showWatermark: boolean
     )
     .join('')
 
-  const watermarkCSS = showWatermark
-    ? `
-      .watermark {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) rotate(-45deg);
-        font-size: 80px;
-        font-weight: bold;
-        color: rgba(59, 130, 246, 0.08);
-        white-space: nowrap;
-        pointer-events: none;
-        z-index: 1000;
-      }
-    `
-    : ''
-
-  const watermarkHTML = showWatermark
-    ? '<div class="watermark">Alfatoora.io</div>'
-    : ''
+  // Footer CSS for "created by" notice
+  const footerCSS = `
+    .created-by-footer {
+      margin-top: 40px;
+      padding-top: 16px;
+      border-top: 1px solid #e5e7eb;
+      text-align: center;
+      font-size: 11px;
+      color: #9ca3af;
+    }
+    .created-by-footer a {
+      color: #6b7280;
+      text-decoration: none;
+    }
+  `
+  
+  // "Created by" footer HTML
+  const createdByLabel = isRTL ? 'تم إنشاء هذه الفاتورة بواسطة' : 'Invoice created with'
+  const createdByFooterHTML = `
+    <div class="created-by-footer">
+      ${createdByLabel} <a href="https://alfatoora.io">Alfatoora.io</a>
+    </div>
+  `
 
   const logoHTML = invoice.senderLogo 
     ? `<img src="${invoice.senderLogo}" alt="Logo" style="height: 60px; width: auto; max-width: 150px; object-fit: contain; ${marginEnd}: 16px;" crossorigin="anonymous" />`
@@ -147,7 +150,7 @@ export function generateInvoiceHTML(invoice: InvoiceData, showWatermark: boolean
           font-family: 'IBM Plex Mono', 'Courier New', monospace;
         }
         
-        ${watermarkCSS}
+        ${footerCSS}
         
         .container {
           max-width: 800px;
@@ -382,7 +385,6 @@ export function generateInvoiceHTML(invoice: InvoiceData, showWatermark: boolean
       </style>
     </head>
     <body>
-      ${watermarkHTML}
       <div class="container">
         <div class="header">
           <div class="header-right">
@@ -515,17 +517,15 @@ export function generateInvoiceHTML(invoice: InvoiceData, showWatermark: boolean
             : ''
         }
         
-        <div class="footer">
-          ${isRTL ? 'تم إنشاء هذه الفاتورة باستخدام الفاتورة.io' : 'Created with Alfatoora.io'}
-        </div>
+        ${createdByFooterHTML}
       </div>
     </body>
     </html>
   `
 }
 
-export async function generatePDF(invoice: InvoiceData, showWatermark: boolean = true, locale: Locale = 'ar'): Promise<boolean> {
-  const html = generateInvoiceHTML(invoice, showWatermark, locale)
+export async function generatePDF(invoice: InvoiceData, _showWatermark: boolean = false, locale: Locale = 'ar'): Promise<boolean> {
+  const html = generateInvoiceHTML(invoice, false, locale)
   
   // Create hidden iframe for rendering
   const iframe = document.createElement('iframe')

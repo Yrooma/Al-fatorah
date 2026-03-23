@@ -1,8 +1,8 @@
 'use client'
 
 import * as React from 'react'
-import { useLanguage, LANGUAGE_CONFIG } from '@/lib/language-context'
-import { Locale } from '@/lib/i18n'
+import { useRouter, usePathname } from 'next/navigation'
+import { locales, localeNames, type Locale, isRTL } from '@/lib/i18n-config'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -13,13 +13,34 @@ import {
 import { Globe, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-const AVAILABLE_LOCALES: Locale[] = ['ar', 'en', 'es', 'fr', 'zh', 'ru', 'hi', 'it', 'pt', 'ur', 'tr', 'sw']
+interface LanguageSwitcherProps {
+  currentLang?: Locale
+}
 
-export function LanguageSwitcher() {
-  const { locale, setLocale, isRTL } = useLanguage()
+export function LanguageSwitcher({ currentLang = 'en' }: LanguageSwitcherProps) {
+  const router = useRouter()
+  const pathname = usePathname()
   const [open, setOpen] = React.useState(false)
   
-  const currentLang = LANGUAGE_CONFIG[locale]
+  const currentLangConfig = localeNames[currentLang]
+  const rtl = isRTL(currentLang)
+  
+  const switchLanguage = (newLang: Locale) => {
+    // Replace current locale in pathname with new locale
+    const segments = pathname.split('/')
+    if (segments[1] && locales.includes(segments[1] as Locale)) {
+      segments[1] = newLang
+    } else {
+      segments.splice(1, 0, newLang)
+    }
+    const newPath = segments.join('/') || `/${newLang}`
+    
+    // Set cookie for middleware
+    document.cookie = `NEXT_LOCALE=${newLang};path=/;max-age=31536000`
+    
+    router.push(newPath)
+    setOpen(false)
+  }
   
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
@@ -31,25 +52,22 @@ export function LanguageSwitcher() {
         >
           <Globe className="h-4 w-4" />
           <span className="text-xs font-medium hidden sm:inline">
-            {currentLang.nativeName}
+            {currentLangConfig.nativeName}
           </span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent 
-        align={isRTL ? 'start' : 'end'} 
+        align={rtl ? 'start' : 'end'} 
         className="w-48 max-h-80 overflow-y-auto"
       >
-        {AVAILABLE_LOCALES.map((langCode) => {
-          const lang = LANGUAGE_CONFIG[langCode]
-          const isSelected = locale === langCode
+        {locales.map((langCode) => {
+          const lang = localeNames[langCode]
+          const isSelected = currentLang === langCode
           
           return (
             <DropdownMenuItem
               key={langCode}
-              onClick={() => {
-                setLocale(langCode)
-                setOpen(false)
-              }}
+              onClick={() => switchLanguage(langCode)}
               className={cn(
                 'flex items-center justify-between cursor-pointer',
                 isSelected && 'bg-accent'

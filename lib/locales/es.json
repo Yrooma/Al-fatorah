@@ -1,0 +1,158 @@
+{
+  "app": {
+    "name": "Alfatoora.io",
+    "invoice": "Factura",
+    "invoiceEn": "Invoice"
+  },
+  "nav": {
+    "newInvoice": "Nueva Factura",
+    "myInvoices": "Mis Facturas",
+    "templates": "Plantillas",
+    "about": "Acerca de"
+  },
+  "settings": {
+    "yourSettings": "Tus Ajustes",
+    "yourSettingsDesc": "Logotipo, información de contacto, cuenta bancaria",
+    "yourLogo": "Tu Logotipo",
+    "uploadLogo": "Subir Logotipo",
+    "logoHint": "PNG o JPG, máx 500KB\nTamaño recomendado: 200×80px",
+    "yourInfo": "Tu Información",
+    "nameOrCompany": "Nombre / Empresa",
+    "address": "Dirección",
+    "phone": "Teléfono",
+    "email": "Correo Electrónico",
+    "bankAccount": "Cuenta Bancaria",
+    "bankName": "Nombre del Banco",
+    "accountHolderName": "Nombre del Titular",
+    "ibanNumber": "Número IBAN",
+    "defaultCurrency": "Moneda Predeterminada",
+    "saveSettings": "Guardar Ajustes",
+    "settingsSaved": "Ajustes guardados correctamente"
+  },
+  "regulatory": {
+    "number": "Número Regulatorio",
+    "label": "Tipo",
+    "value": "Número",
+    "add": "Añadir Número",
+    "remove": "Eliminar",
+    "placeholderLabel": "ej., NIF, CIF...",
+    "placeholderValue": "Número"
+  },
+  "invoice": {
+    "number": "Número de Factura",
+    "date": "Fecha",
+    "dueDate": "Fecha de Vencimiento",
+    "showDueDate": "Fecha de Vencimiento",
+    "from": "De",
+    "to": "Para",
+    "senderName": "Remitente / Empresa",
+    "senderAddress": "Dirección",
+    "clientName": "Cliente / Empresa",
+    "clientAddress": "Dirección",
+    "recentClients": "Clientes Recientes"
+  },
+  "items": {
+    "description": "Descripción",
+    "quantity": "Cant.",
+    "price": "Precio",
+    "total": "Total",
+    "addItem": "Añadir Artículo",
+    "item": "Artículo",
+    "serviceOrProductDesc": "Descripción del servicio o producto"
+  },
+  "totals": {
+    "subtotal": "Subtotal",
+    "discount": "Descuento",
+    "grandTotal": "Total General"
+  },
+  "tax": {
+    "tax": "Impuesto",
+    "rate": "Tasa de Impuesto",
+    "number": "Número de Impuesto",
+    "add": "Añadir Impuesto",
+    "ratePlaceholder": "21",
+    "numberPlaceholder": "Número de registro fiscal (opcional)"
+  },
+  "payment": {
+    "status": "Estado de Pago",
+    "paid": "Pagado",
+    "unpaid": "No Pagado",
+    "partial": "Parcial",
+    "amountPaid": "Monto Pagado",
+    "amountDue": "Monto Adeudado"
+  },
+  "bank": {
+    "info": "Información Bancaria",
+    "iban": "IBAN"
+  },
+  "notes": {
+    "optional": "Notas adicionales (opcional)"
+  },
+  "actions": {
+    "save": "Guardar",
+    "download": "Descargar",
+    "downloadPdf": "Descargar PDF",
+    "downloading": "Descargando...",
+    "invoiceSaved": "Factura guardada con éxito",
+    "invoiceDownloaded": "Factura descargada con éxito",
+    "downloadError": "Error al generar el PDF",
+    "delete": "Eliminar",
+    "view": "Ver",
+    "edit": "Editar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar"
+  },
+  "invoices": {
+    "count": "facturas guardadas",
+    "noInvoicesYet": "Aún no hay facturas",
+    "startCreating": "Comienza creando tu primera factura",
+    "create": "Crear Factura",
+    "deleteInvoice": "Eliminar Factura",
+    "deleteConfirm": "¿Seguro que quieres eliminar esta factura? Esta acción no se puede deshacer.",
+    "deleted": "Factura eliminada"
+  },
+  "success": {
+    "created": "¡Factura creada con éxito!",
+    "downloadedTo": "Factura descargada en tu carpeta de Descargas",
+    "savedLocally": "Se ha guardado una copia en \"Mis Facturas\"",
+    "editInvoice": "Editar Factura",
+    "viewInvoices": "Ver Mis Facturas",
+    "createNew": "Crear Nueva Factura",
+    "shareWithOthers": "¿Te gusta esta herramienta? ¡Compártela!",
+    "shareMessage": "Crea facturas fácilmente con Alfatoora.io - ¡Gratis y en varios idiomas!",
+    "copyLink": "Copiar Enlace",
+    "linkCopied": "¡Enlace copiado!",
+    "shareOnTwitter": "Compartir en X",
+    "shareOnWhatsApp": "Compartir en WhatsApp"
+  },
+  "misc": {
+    "optional": "opcional",
+    "imageTooLarge": "Imagen demasiado grande. Máx 500KB",
+    "currency": "Moneda"
+  },
+  "errors": {
+    "invoiceNotFound": "Factura no encontrada",
+    "invoiceNotFoundDesc": "No se pudo encontrar la factura solicitada",
+    "backToInvoices": "Volver a Facturas"
+  },
+  "templates": {
+    "title": "Plantillas de Facturas",
+    "subtitle": "Plantillas profesionales para cada industria",
+    "comingSoon": "Próximamente",
+    "comingSoonDesc": "Estamos preparando una colección de plantillas de facturas profesionales diseñadas para diferentes industrias y profesiones.",
+    "notifyMe": "Notifícame cuando estén listas",
+    "categories": {
+      "freelance": "Freelance",
+      "construction": "Construcción",
+      "services": "Servicios",
+      "retail": "Comercio",
+      "consulting": "Consultoría",
+      "creative": "Creativos"
+    }
+  },
+  "legal": {
+    "about": "Acerca de",
+    "privacy": "Política de Privacidad",
+    "terms": "Términos de Servicio"
+  }
+}

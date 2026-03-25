@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next'
 import { locales } from '@/lib/i18n-config'
 
 const baseUrl = 'https://alfatoora.io'
-const pages = ['', '/invoices', '/about', '/privacy', '/terms']
+const pages = ['', '/invoices', '/templates', '/about', '/privacy', '/terms']
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const entries: MetadataRoute.Sitemap = []

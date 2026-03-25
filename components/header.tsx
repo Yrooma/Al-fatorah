@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { FileText, FolderOpen, Info } from 'lucide-react'
+import { FileText, FolderOpen, Info, LayoutTemplate } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { translations } from '@/lib/i18n'
 import { type Locale, isRTL as checkRTL, localeNames } from '@/lib/i18n-config'
@@ -20,6 +20,7 @@ export function Header({ lang = 'en' }: HeaderProps) {
   const navItems = [
     { href: `/${lang}`, label: t.newInvoice, icon: FileText },
     { href: `/${lang}/invoices`, label: t.myInvoices, icon: FolderOpen },
+    { href: `/${lang}/templates`, label: rtl ? 'القوالب' : 'Templates', icon: LayoutTemplate },
     { href: `/${lang}/about`, label: rtl ? 'حول' : 'About', icon: Info },
   ]
   

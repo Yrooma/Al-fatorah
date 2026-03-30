@@ -29,17 +29,21 @@ import {
   createEmptyInvoice,
 } from '@/lib/types'
 import { saveInvoice, getSettings, getRecentClients, saveSettings, UserSettings } from '@/lib/storage'
-import { useLanguage } from '@/lib/language-context'
+import { translations } from '@/lib/i18n'
+import { type Locale, isRTL as checkRTL } from '@/lib/i18n-config'
 import { cn } from '@/lib/utils'
 
 interface InvoiceEditorProps {
   initialData?: InvoiceData
   onSave?: (invoice: InvoiceData) => void
+  lang?: Locale
 }
 
-export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
+export function InvoiceEditor({ initialData, onSave, lang = 'en' }: InvoiceEditorProps) {
   const router = useRouter()
-  const { t, locale, isRTL } = useLanguage()
+  const t = translations[lang] || translations.en
+  const locale = lang
+  const isRTL = checkRTL(lang)
   
   const [invoice, setInvoice] = React.useState<InvoiceData | null>(null)
   const [settings, setSettings] = React.useState<UserSettings | null>(null)
@@ -260,14 +264,14 @@ export function InvoiceEditor({ initialData, onSave }: InvoiceEditorProps) {
       const { generatePDF } = await import('@/lib/pdf-generator')
       
       // Generate and download PDF
-      const success = await generatePDF(invoice, true, locale)
+      const success = await generatePDF(invoice, false, locale)
       
       if (success) {
         // Small delay to ensure download started
         await new Promise(resolve => setTimeout(resolve, 500))
         
         // Navigate to success page
-        router.push(`/success/${invoice.id}`)
+        router.push(`/${lang}/success/${invoice.id}`)
       } else {
         showMessage(t.downloadError)
         setIsGeneratingPdf(false)

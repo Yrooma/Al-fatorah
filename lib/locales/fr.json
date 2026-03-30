@@ -1,0 +1,158 @@
+{
+  "app": {
+    "name": "Alfatoora.io",
+    "invoice": "Facture",
+    "invoiceEn": "Invoice"
+  },
+  "nav": {
+    "newInvoice": "Nouvelle Facture",
+    "myInvoices": "Mes Factures",
+    "templates": "Modèles",
+    "about": "À propos"
+  },
+  "settings": {
+    "yourSettings": "Vos Paramètres",
+    "yourSettingsDesc": "Logo, coordonnées, compte bancaire",
+    "yourLogo": "Votre Logo",
+    "uploadLogo": "Importer le logo",
+    "logoHint": "PNG ou JPG, max 500KB\nTaille recommandée: 200×80px",
+    "yourInfo": "Vos Informations",
+    "nameOrCompany": "Nom / Entreprise",
+    "address": "Adresse",
+    "phone": "Numéro de Téléphone",
+    "email": "Email",
+    "bankAccount": "Compte Bancaire",
+    "bankName": "Nom de la Banque",
+    "accountHolderName": "Nom du Titulaire",
+    "ibanNumber": "Numéro IBAN",
+    "defaultCurrency": "Devise par défaut",
+    "saveSettings": "Enregistrer les Paramètres",
+    "settingsSaved": "Paramètres enregistrés avec succès"
+  },
+  "regulatory": {
+    "number": "Numéro Réglementaire",
+    "label": "Type",
+    "value": "Numéro",
+    "add": "Ajouter un numéro",
+    "remove": "Supprimer",
+    "placeholderLabel": "ex: SIRET, TVA...",
+    "placeholderValue": "Numéro"
+  },
+  "invoice": {
+    "number": "Numéro de Facture",
+    "date": "Date",
+    "dueDate": "Date d'échéance",
+    "showDueDate": "Date d'échéance",
+    "from": "De",
+    "to": "À",
+    "senderName": "Expéditeur / Entreprise",
+    "senderAddress": "Adresse",
+    "clientName": "Client / Entreprise",
+    "clientAddress": "Adresse",
+    "recentClients": "Clients Récents"
+  },
+  "items": {
+    "description": "Description",
+    "quantity": "Qté",
+    "price": "Prix",
+    "total": "Total",
+    "addItem": "Ajouter un article",
+    "item": "Article",
+    "serviceOrProductDesc": "Description du service ou produit"
+  },
+  "totals": {
+    "subtotal": "Sous-total",
+    "discount": "Remise",
+    "grandTotal": "Total Général"
+  },
+  "tax": {
+    "tax": "Taxe",
+    "rate": "Taux de Taxe",
+    "number": "Numéro de TVA",
+    "add": "Ajouter une taxe",
+    "ratePlaceholder": "20",
+    "numberPlaceholder": "Numéro de TVA (optionnel)"
+  },
+  "payment": {
+    "status": "Statut du Paiement",
+    "paid": "Payé",
+    "unpaid": "Non Payé",
+    "partial": "Partiel",
+    "amountPaid": "Montant Payé",
+    "amountDue": "Montant Dû"
+  },
+  "bank": {
+    "info": "Informations Bancaires",
+    "iban": "IBAN"
+  },
+  "notes": {
+    "optional": "Notes supplémentaires (optionnel)"
+  },
+  "actions": {
+    "save": "Enregistrer",
+    "download": "Télécharger",
+    "downloadPdf": "Télécharger PDF",
+    "downloading": "Téléchargement...",
+    "invoiceSaved": "Facture enregistrée avec succès",
+    "invoiceDownloaded": "Facture téléchargée avec succès",
+    "downloadError": "Erreur lors de la création du PDF",
+    "delete": "Supprimer",
+    "view": "Voir",
+    "edit": "Modifier",
+    "cancel": "Annuler",
+    "confirm": "Confirmer"
+  },
+  "invoices": {
+    "count": "factures enregistrées",
+    "noInvoicesYet": "Aucune facture pour le moment",
+    "startCreating": "Commencez par créer votre première facture",
+    "create": "Créer une Facture",
+    "deleteInvoice": "Supprimer la Facture",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cette facture ? Cette action est irréversible.",
+    "deleted": "Facture supprimée"
+  },
+  "success": {
+    "created": "Facture créée avec succès !",
+    "downloadedTo": "Facture téléchargée dans votre dossier Téléchargements",
+    "savedLocally": "Une copie a été sauvegardée dans \"Mes Factures\"",
+    "editInvoice": "Modifier la Facture",
+    "viewInvoices": "Voir Mes Factures",
+    "createNew": "Créer une Nouvelle Facture",
+    "shareWithOthers": "Vous aimez cet outil ? Partagez-le !",
+    "shareMessage": "Créez vos factures facilement avec Alfatoora.io - Gratuit !",
+    "copyLink": "Copier le Lien",
+    "linkCopied": "Lien copié !",
+    "shareOnTwitter": "Partager sur X",
+    "shareOnWhatsApp": "Partager sur WhatsApp"
+  },
+  "misc": {
+    "optional": "optionnel",
+    "imageTooLarge": "Image trop grande. Max 500KB",
+    "currency": "Devise"
+  },
+  "errors": {
+    "invoiceNotFound": "Facture introuvable",
+    "invoiceNotFoundDesc": "La facture demandée est introuvable",
+    "backToInvoices": "Retour aux factures"
+  },
+  "templates": {
+    "title": "Modèles de Factures",
+    "subtitle": "Modèles professionnels pour chaque industrie",
+    "comingSoon": "Bientôt disponible",
+    "comingSoonDesc": "Nous préparons une collection de modèles de factures professionnels conçus pour différentes industries et professions.",
+    "notifyMe": "Me notifier quand les modèles sont prêts",
+    "categories": {
+      "freelance": "Freelance",
+      "construction": "Construction",
+      "services": "Services",
+      "retail": "Commerce",
+      "consulting": "Conseil",
+      "creative": "Créatifs"
+    }
+  },
+  "legal": {
+    "about": "À propos",
+    "privacy": "Politique de Confidentialité",
+    "terms": "Conditions d'Utilisation"
+  }
+}

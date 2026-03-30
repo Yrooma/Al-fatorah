@@ -1,0 +1,158 @@
+{
+  "app": {
+    "name": "الفاتورة.io",
+    "invoice": "فاتورة",
+    "invoiceEn": "Invoice"
+  },
+  "nav": {
+    "newInvoice": "فاتورة جديدة",
+    "myInvoices": "فواتيري",
+    "templates": "القوالب",
+    "about": "حول"
+  },
+  "settings": {
+    "yourSettings": "بياناتك وإعداداتك",
+    "yourSettingsDesc": "الشعار، معلومات الاتصال، الحساب البنكي",
+    "yourLogo": "شعارك / لوقو",
+    "uploadLogo": "رفع الشعار",
+    "logoHint": "PNG أو JPG، الحد الأقصى 500KB\nيُفضل حجم 200×80 بكسل",
+    "yourInfo": "معلوماتك",
+    "nameOrCompany": "الاسم / اسم الشركة",
+    "address": "العنوان",
+    "phone": "رقم الهاتف",
+    "email": "البريد الإلكتروني",
+    "bankAccount": "الحساب البنكي",
+    "bankName": "اسم البنك",
+    "accountHolderName": "اسم صاحب الحساب",
+    "ibanNumber": "رقم الآيبان IBAN",
+    "defaultCurrency": "العملة الافتراضية",
+    "saveSettings": "حفظ الإعدادات",
+    "settingsSaved": "تم حفظ الإعدادات بنجاح"
+  },
+  "regulatory": {
+    "number": "رقم تنظيمي",
+    "label": "نوع الرقم",
+    "value": "الرقم",
+    "add": "إضافة رقم تنظيمي",
+    "remove": "حذف",
+    "placeholderLabel": "مثال: السجل التجاري، وثيقة العمل الحر...",
+    "placeholderValue": "الرقم"
+  },
+  "invoice": {
+    "number": "رقم الفاتورة",
+    "date": "التاريخ",
+    "dueDate": "تاريخ الاستحقاق",
+    "showDueDate": "تاريخ الاستحقاق",
+    "from": "من",
+    "to": "إلى",
+    "senderName": "اسم المرسل / الشركة",
+    "senderAddress": "العنوان",
+    "clientName": "اسم العميل / الشركة",
+    "clientAddress": "العنوان",
+    "recentClients": "العملاء السابقون"
+  },
+  "items": {
+    "description": "الوصف",
+    "quantity": "الكمية",
+    "price": "السعر",
+    "total": "المجموع",
+    "addItem": "إضافة بند",
+    "item": "بند",
+    "serviceOrProductDesc": "وصف الخدمة أو المنتج"
+  },
+  "totals": {
+    "subtotal": "المجموع الفرعي",
+    "discount": "خصم",
+    "grandTotal": "الإجمالي"
+  },
+  "tax": {
+    "tax": "ضريبة",
+    "rate": "نسبة الضريبة",
+    "number": "الرقم الضريبي",
+    "add": "إضافة ضريبة",
+    "ratePlaceholder": "15",
+    "numberPlaceholder": "رقم التسجيل الضريبي (اختياري)"
+  },
+  "payment": {
+    "status": "حالة الدفع",
+    "paid": "مدفوعة",
+    "unpaid": "غير مدفوعة",
+    "partial": "جزئية",
+    "amountPaid": "المبلغ المدفوع",
+    "amountDue": "المبلغ المطلوب"
+  },
+  "bank": {
+    "info": "معلومات الحساب البنكي",
+    "iban": "IBAN"
+  },
+  "notes": {
+    "optional": "ملاحظات إضافية (اختياري)"
+  },
+  "actions": {
+    "save": "حفظ",
+    "download": "تحميل",
+    "downloadPdf": "تحميل PDF",
+    "downloading": "جاري التحميل...",
+    "invoiceSaved": "تم حفظ الفاتورة بنجاح",
+    "invoiceDownloaded": "تم تحميل الفاتورة بنجاح",
+    "downloadError": "حدث خطأ أثناء إنشاء الـ PDF",
+    "delete": "حذف",
+    "view": "عرض",
+    "edit": "تعديل",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد"
+  },
+  "invoices": {
+    "count": "فاتورة محفوظة",
+    "noInvoicesYet": "لا توجد فواتير بعد",
+    "startCreating": "ابدأ بإنشاء أول فاتورة لك",
+    "create": "إنشاء فاتورة",
+    "deleteInvoice": "حذف الفاتورة",
+    "deleteConfirm": "هل أنت متأكد من حذف الفاتورة؟ لا يمكن التراجع عن هذا الإجراء.",
+    "deleted": "تم حذف الفاتورة"
+  },
+  "success": {
+    "created": "تم إصدار الفاتورة بنجاح!",
+    "downloadedTo": "تم تحميل الفاتورة إلى مجلد التنزيلات",
+    "savedLocally": "تم حفظ نسخة في \"فواتيري\" للرجوع إليها لاحقاً",
+    "editInvoice": "تعديل الفاتورة",
+    "viewInvoices": "عرض فواتيري",
+    "createNew": "إصدار فاتورة جديدة",
+    "shareWithOthers": "أعجبك الموقع؟ شاركه مع الآخرين!",
+    "shareMessage": "أنشئ فواتيرك بسهولة وسرعة مع الفاتورة.io - مجاني وبالعربي!",
+    "copyLink": "نسخ الرابط",
+    "linkCopied": "تم نسخ الرابط!",
+    "shareOnTwitter": "شارك على X",
+    "shareOnWhatsApp": "شارك على واتساب"
+  },
+  "misc": {
+    "optional": "اختياري",
+    "imageTooLarge": "حجم الصورة كبير جداً. الحد الأقصى 500KB",
+    "currency": "العملة"
+  },
+  "errors": {
+    "invoiceNotFound": "الفاتورة غير موجودة",
+    "invoiceNotFoundDesc": "لم يتم العثور على الفاتورة المطلوبة",
+    "backToInvoices": "العودة للفواتير"
+  },
+  "templates": {
+    "title": "قوالب الفواتير",
+    "subtitle": "قوالب احترافية لكل مجال",
+    "comingSoon": "قريباً",
+    "comingSoonDesc": "نحن نعمل على إعداد مجموعة من قوالب الفواتير الاحترافية المصممة خصيصاً لمختلف المجالات والمهن.",
+    "notifyMe": "أعلمني عند توفر القوالب",
+    "categories": {
+      "freelance": "العمل الحر",
+      "construction": "المقاولات",
+      "services": "الخدمات",
+      "retail": "التجزئة",
+      "consulting": "الاستشارات",
+      "creative": "الإبداع"
+    }
+  },
+  "legal": {
+    "about": "حول",
+    "privacy": "سياسة الخصوصية",
+    "terms": "شروط الخدمة"
+  }
+}

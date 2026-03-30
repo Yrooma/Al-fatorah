@@ -11,6 +11,29 @@ export interface RegulatoryNumber {
   value: string
 }
 
+// Template categories for industry-specific invoices
+export type TemplateCategory = 
+  | 'freelance' 
+  | 'construction' 
+  | 'services' 
+  | 'retail' 
+  | 'consulting' 
+  | 'creative'
+  | 'healthcare'
+  | 'legal'
+  | 'technology'
+  | 'education'
+
+// Invoice template definition
+export interface InvoiceTemplate {
+  slug: string
+  category: TemplateCategory
+  defaultItems: Partial<InvoiceItem>[]
+  defaultCurrency?: string
+  defaultTaxRate?: number
+  defaultTaxEnabled?: boolean
+}
+
 export interface InvoiceData {
   id: string
   invoiceNumber: string
@@ -18,6 +41,9 @@ export interface InvoiceData {
   dueDate: string
   showDueDate: boolean
   senderLogo: string
+  
+  // Template tracking (for analytics and future features)
+  templateSlug?: string
   
   // Regulatory Numbers (flexible - can be freelance doc, commercial register, etc.)
   regulatoryNumbers: RegulatoryNumber[]
